@@ -8,3 +8,8 @@ http://127.0.0.1:8000/docs
 pip install fastapi uvicorn
 pip freeze > requirements.txt
 pip install python-dotenv
+
+logger.info("Admin created successfully")
+logger.warning("Duplicate admin email attempted")
+logger.error("Failed to create admin")
+pip install email-validator
