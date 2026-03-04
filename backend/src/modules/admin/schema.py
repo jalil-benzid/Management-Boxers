@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from uuid import UUID
+from typing import List
 
 class AdminCreate(BaseModel):
     email: EmailStr
@@ -18,3 +19,9 @@ class AdminResponseModel(BaseModel):
     success: bool
     message: str
     data: AdminResponse | None
+
+
+class AdminListResponseModel(BaseModel):
+    success: bool
+    message: str
+    data: List[AdminResponse]

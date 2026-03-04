@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update, delete
 from passlib.context import CryptContext
 from src.modules.admin.utils.logger import logger
+from uuid import UUID
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -19,16 +20,17 @@ class AdminService:
             async with async_session() as session:
                 async with session.begin():
                     session.add(new_admin)
-                await session.commit()
+
                 await session.refresh(new_admin)
 
             logger.info(f"[Service] Admin created: {new_admin.email} (id: {new_admin.id})")
 
-            return AdminResponse.model_validate(new_admin)
-        
+            return new_admin  # <-- RETURN ORM OBJECT
+
         except Exception as e:
             logger.error(f"[Service] Failed to create admin ({email}): {str(e)}")
             raise
+
 
     @staticmethod
     async def get_admin_by_email(email: str) -> Admin | None:
@@ -44,18 +46,23 @@ class AdminService:
             raise
 
     @staticmethod
-    async def get_admin_by_id(admin_id: str) -> Admin | None:
+    async def get_admin_by_id(admin_id: UUID) -> Admin | None:
         try:
             async with async_session() as session:
-                result = await session.execute(select(Admin).where(Admin.id == admin_id))
+                result = await session.execute(
+                    select(Admin).where(Admin.id == admin_id)
+                )
                 admin = result.scalars().first()
+
                 if admin:
                     logger.debug(f"[Service] Found admin by id: {admin_id}")
+
                 return admin
+
         except Exception as e:
             logger.error(f"[Service] Error fetching admin by id ({admin_id}): {str(e)}")
             raise
-
+        
     @staticmethod
     async def get_all_admins() -> list[Admin]:
         try:
@@ -69,7 +76,7 @@ class AdminService:
             raise
 
     @staticmethod
-    async def update_admin(admin_id: str, email: str | None = None, password: str | None = None) -> Admin | None:
+    async def update_admin(admin_id: UUID, email: str | None = None, password: str | None = None) -> Admin | None:
         try:
             async with async_session() as session:
                 async with session.begin():
@@ -93,7 +100,7 @@ class AdminService:
             raise
 
     @staticmethod
-    async def delete_admin(admin_id: str) -> bool:
+    async def delete_admin(admin_id: UUID) -> bool:
         try:
             async with async_session() as session:
                 async with session.begin():
