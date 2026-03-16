@@ -2,6 +2,8 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from src.modules.admin.service import AdminService
+from src.modules.coach.service import CoachService
+from src.modules.boxer.service import BoxerService
 from src.modules.auth.utils.logger import logger
 from src.core.config import settings
 
@@ -42,4 +44,48 @@ class AuthService:
 
         except Exception as e:
             logger.error(f"[Service] Login error ({email}): {str(e)}")
+            raise
+
+    @staticmethod
+    async def login_coach(email: str, password: str):
+        try:
+            coach = await CoachService.get_coach_by_email(email)
+            if not coach:
+                logger.warning(f"[Service] Coach login failed - email not found: {email}")
+                return None
+
+            if not AuthService.verify_password(password, coach.password):
+                logger.warning(f"[Service] Coach login failed - wrong password: {email}")
+                return None
+
+            token = AuthService.create_access_token({
+                "sub": str(coach.id),
+                "role": "coach"
+            })
+            return token
+
+        except Exception as e:
+            logger.error(f"[Service] Coach login error ({email}): {str(e)}")
+            raise
+
+    @staticmethod
+    async def login_boxer(email: str, password: str):
+        try:
+            boxer = await BoxerService.get_boxer_by_email(email)
+            if not boxer:
+                logger.warning(f"[Service] Boxer login failed - email not found: {email}")
+                return None
+
+            if not AuthService.verify_password(password, boxer.password):
+                logger.warning(f"[Service] Boxer login failed - wrong password: {email}")
+                return None
+
+            token = AuthService.create_access_token({
+                "sub": str(boxer.id),
+                "role": "boxer"
+            })
+            return token
+
+        except Exception as e:
+            logger.error(f"[Service] Boxer login error ({email}): {str(e)}")
             raise

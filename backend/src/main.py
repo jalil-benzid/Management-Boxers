@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from src.api import api_router
 from src.db.database import engine
 from src.db.base import Base
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI(title="Management Boxers API")
 
@@ -15,3 +17,5 @@ async def startup():
 @app.get("/")
 async def root():
     return {"message": "Alive"}
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

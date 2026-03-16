@@ -9,6 +9,7 @@ pip install fastapi uvicorn
 pip freeze > requirements.txt
 pip install python-dotenv
 pip install python-jose[cryptography] python-multipart
+pip install python-multipart
 
 logger.info("Admin created successfully")
 logger.warning("Duplicate admin email attempted")
