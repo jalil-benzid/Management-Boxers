@@ -5,6 +5,7 @@ from src.modules.auth.router import router as auth_router
 from src.modules.coach.router import router as coach_router
 from src.modules.boxer.router import router as boxer_router
 from src.modules.schedule.router import router as schedule_router
+from src.modules.session.router import router as session_router
 
 
 
@@ -15,3 +16,4 @@ api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(coach_router, prefix="/coaches", tags=["Coaches"])
 api_router.include_router(boxer_router, prefix="/boxers", tags=["Boxers"])
 api_router.include_router(schedule_router, prefix="/schedules", tags=["Schedules"])
+api_router.include_router(session_router, prefix="/schedules", tags=["Sessions"])
