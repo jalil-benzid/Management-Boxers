@@ -9,6 +9,9 @@ COPY . .
 
 RUN mkdir -p uploads/boxers
 
+COPY start.sh .
+RUN chmod +x start.sh
+
 EXPOSE 8000
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./start.sh"]
