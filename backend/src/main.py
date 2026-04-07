@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Management Boxers API")
 
-# ✅ ADD THIS BLOCK
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

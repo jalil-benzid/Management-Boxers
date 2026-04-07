@@ -60,3 +60,5 @@ EOF
 cat > src/index.css << 'EOF'
 @import "tailwindcss";
 EOF
+
+

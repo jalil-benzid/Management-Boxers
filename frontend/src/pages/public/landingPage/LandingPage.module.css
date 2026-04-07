@@ -1,0 +1,521 @@
+.page {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* PAGE BACKGROUND - COVERS ENTIRE PAGE WITH DARKVEIL */
+.pageBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ==================== HERO SECTION ==================== */
+
+.heroSection {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.heroContainer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 800px;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroTitle {
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: white;
+}
+
+.heroSubtitle {
+  font-size: clamp(16px, 2vw, 20px);
+  opacity: 0.7;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  color: white;
+}
+
+/* ==================== NAVBAR ==================== */
+
+.navbar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90%, 1200px);
+  padding: 12px 32px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  z-index: 100;
+  transition: all 0.3s ease;
+
+  &.scrolled {
+    top: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(229, 34, 52, 0.2);
+    box-shadow: 0 8px 32px rgba(229, 34, 52, 0.1);
+  }
+}
+
+/* NAVBAR LEFT - LOGO */
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.brand {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: white;
+}
+
+/* NAVBAR CENTER - NAVIGATION LINKS */
+.navCenter {
+  display: flex;
+  gap: 40px;
+  flex: 1;
+  justify-content: center;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+
+  &:hover {
+    color: #e52234;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #e52234;
+    transition: width 0.3s ease;
+  }
+
+  &:hover::after {
+    width: 100%;
+  }
+}
+
+/* NAVBAR RIGHT */
+.navRight {
+  flex-shrink: 0;
+}
+
+/* ==================== BUTTONS ==================== */
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* PRIMARY BUTTON */
+.btnPrimary {
+  background: linear-gradient(135deg, #e52234 0%, #c91e2f 100%);
+  color: white;
+  border: 1px solid #e52234;
+
+  &:hover {
+    background: linear-gradient(135deg, #c91e2f 0%, #a01a26 100%);
+    box-shadow: 0 12px 32px rgba(229, 34, 52, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* SECONDARY BUTTON */
+.btnSecondary {
+  background: transparent;
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+
+  &:hover {
+    border-color: #e52234;
+    color: #e52234;
+    background: rgba(229, 34, 52, 0.1);
+    box-shadow: 0 8px 24px rgba(229, 34, 52, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+/* BUTTON ICON */
+.btnIcon {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.btnPrimary:hover .btnIcon {
+  transform: translateX(4px);
+}
+
+/* LARGE BUTTON */
+.btnLarge {
+  padding: 16px 40px;
+  font-size: 16px;
+}
+
+/* ==================== SECTIONS ==================== */
+
+.section {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 20px;
+  color: white;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 60px;
+  max-width: 600px;
+
+  h2 {
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  p {
+    font-size: clamp(14px, 1.5vw, 18px);
+    opacity: 0.6;
+    line-height: 1.6;
+  }
+}
+
+/* ==================== FEATURES SECTION ==================== */
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.featureCard {
+  padding: 32px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(229, 34, 52, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+
+  &:hover {
+    background: rgba(229, 34, 52, 0.05);
+    border-color: rgba(229, 34, 52, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 24px 48px rgba(229, 34, 52, 0.15);
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  p {
+    opacity: 0.6;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+.featureIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+/* ==================== PRICING SECTION ==================== */
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.pricingCard {
+  padding: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  &.highlight {
+    background: rgba(229, 34, 52, 0.08);
+    border-color: #e52234;
+    transform: scale(1.05);
+  }
+
+  &:hover {
+    border-color: #e52234;
+    box-shadow: 0 24px 48px rgba(229, 34, 52, 0.2);
+  }
+}
+
+.price {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.amount {
+  font-size: 36px;
+  font-weight: 800;
+  color: #e52234;
+}
+
+.period {
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.planDescription {
+  opacity: 0.6;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.pricingCard .btn {
+  margin-bottom: 28px;
+  width: 100%;
+  justify-content: center;
+}
+
+.featuresList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 10px 0;
+    opacity: 0.7;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .check {
+    color: #e52234;
+    font-weight: bold;
+    font-size: 16px;
+  }
+}
+
+/* ==================== CONTACT SECTION ==================== */
+
+.contactContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.contactSubtext {
+  opacity: 0.5;
+  font-size: 14px;
+}
+
+/* ==================== FOOTER ==================== */
+
+.footer {
+  padding: 40px 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.6;
+  font-size: 12px;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 16px;
+
+  a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #e52234;
+    }
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .navCenter {
+    display: none;
+  }
+
+  .navbar {
+    width: 95%;
+    padding: 12px 20px;
+  }
+
+  .navLeft {
+    gap: 8px;
+  }
+
+  .brand {
+    font-size: 12px;
+  }
+
+  .logo {
+    width: 24px;
+  }
+
+  .heroTitle {
+    font-size: 42px;
+  }
+
+  .section {
+    padding: 60px 20px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 32px;
+  }
+
+  .featuresGrid,
+  .pricingGrid {
+    gap: 20px;
+  }
+
+  .featureCard,
+  .pricingCard {
+    padding: 24px;
+  }
+
+  .pricingCard.highlight {
+    transform: scale(1);
+  }
+
+  .footerLinks {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .heroSubtitle {
+    font-size: 14px;
+  }
+
+  .section {
+    padding: 40px 16px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .btnLarge {
+    padding: 12px 32px;
+  }
+}
+

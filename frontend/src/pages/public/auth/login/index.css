@@ -1,0 +1,63 @@
+/* 🔥 INPUT EFFECT */
+.input-field {
+  border-color: var(--color-gray);
+  color: var(--color-white);
+  transition: all 0.25s ease;
+
+  &:focus {
+    border-color: var(--color-red);
+    box-shadow: 0 0 0 2px rgba(229, 34, 52, 0.2);
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* 🔥 BUTTON EFFECT */
+.login-btn {
+  background-color: var(--color-red);
+  color: var(--color-white);
+  transition: all 0.25s ease;
+  transform: translateY(0);
+
+  &:hover {
+    background-color: #ff2a3d; 
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(229, 34, 52, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(229, 34, 52, 0.2);
+  }
+}
+
+/* 🔥 PAGE ANIMATIONS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.6s ease;
+}

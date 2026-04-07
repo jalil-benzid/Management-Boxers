@@ -1,0 +1,25 @@
+.text-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.text-subtitle {
+  font-size: 14px;
+  color: var(--color-gray);
+}
+
+.text-label {
+  font-size: 13px;
+  color: var(--color-white);
+}
+
+.text-brand {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--color-gray);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}

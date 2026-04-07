@@ -1,0 +1,43 @@
+@import "./variables";
+
+:root {
+  --color-black: #{$color-black};
+  --color-black-2: #{$color-black-2};
+  --color-black-3: #{$color-black-3};
+  --color-black-4: #{$color-black-4};
+
+  --color-white: #{$color-white};
+  --color-red: #{$color-red};
+  --color-gray: #{$color-gray};
+}
+
+::selection {
+  background: var(--color-red);
+  color: var(--color-white);
+}
+
+/* base */
+body {
+  background: var(--color-black);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* allow text selection where needed */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* prevent selection */
+img,
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
