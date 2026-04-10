@@ -23,5 +23,5 @@ api_router.include_router(session_router, prefix="/schedules", tags=["Sessions"]
 api_router.include_router(exercise_router, prefix="/sessions", tags=["Exercises"])
 api_router.include_router(attendance_router, prefix="/sessions", tags=["Attendance"])
 api_router.include_router(review_router, prefix="/sessions", tags=["Reviews"])
-api_router.include_router(analytics_admin_router,prefix="/analytics/admin")
+api_router.include_router(analytics_admin_router,prefix="/analytics/admin",tags=["Admin Analytics"])
 
