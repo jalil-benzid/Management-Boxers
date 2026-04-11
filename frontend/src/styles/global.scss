@@ -80,3 +80,45 @@ html, body {
   z-index: 50;
   width: 300px;
 }
+
+/* =========================
+   Custom Scrollbar (Global)
+   ========================= */
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px; // slightly more modern than 4px
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-black-2); // subtle dark track
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-white); // your accent color
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-black-4); // darker hover state
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-white) var(--color-black-2);
+}
+
+/* Optional: hide scrollbar on mobile (clean UI like modern apps) */
+@media (max-width: 768px) {
+  * {
+    scrollbar-width: none; // Firefox
+  }
+
+  *::-webkit-scrollbar {
+    display: none; // Chrome/Safari
+  }
+}

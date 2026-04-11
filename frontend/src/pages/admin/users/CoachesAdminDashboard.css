@@ -96,7 +96,7 @@
 
 /* Table Container */
 .table-container {
-  background: var(--color-black-2);
+  background: var(--color-black);
   border-radius: 0.5rem;
   overflow-x: auto;
   border: 1px solid var(--color-black-3);
@@ -232,7 +232,7 @@
 
 /* Table Container - UPDATED */
 .table-container {
-  background: var(--color-black-2);
+  background: var(--color-black);
   border-radius: 0.5rem;
   overflow-x: visible; /* Changed from 'auto' to 'visible' */
   border: 1px solid var(--color-black-3);

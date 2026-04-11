@@ -64,7 +64,7 @@
     max-width: 100%;
 
     .settings-section {
-      background: var(--color-black-2);
+      background: var(--color-black);  // Changed from var(--color-black-2)
       border-radius: 16px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
@@ -128,7 +128,7 @@
           align-items: center;
           gap: 1rem;
           padding: 0.875rem 1rem;
-          background: var(--color-black-3);
+          background: var(--color-black);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 12px;
           cursor: pointer;
@@ -159,7 +159,7 @@
           }
 
           &.active {
-            background: var(--color-black-4);
+            background: var(--color-black);
             border-color: var(--color-red);
             
             .language-name {
@@ -214,21 +214,21 @@
         }
       }
 
-      &.coming-soon {
-        background: var(--color-black-2);
-        opacity: 0.7;
+&.coming-soon {
+      background: var(--color-black);  // Changed from var(--color-black-2)
+      opacity: 0.7;
 
-        .settings-note {
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 0.875rem;
-          margin: 0;
-          line-height: 1.5;
-        }
+  .settings-note {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.5;
+  }
 
-        .section-header h2 {
-          opacity: 0.8;
-        }
-      }
+  .section-header h2 {
+    opacity: 0.8;
+  }
+}
     }
   }
 

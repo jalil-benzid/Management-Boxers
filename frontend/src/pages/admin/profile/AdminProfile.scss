@@ -8,7 +8,7 @@
   .profile-card {
     max-width: 800px;
     margin: 2rem auto 0 auto;
-    background: var(--color-black-2);
+    background: var(--color-black);  // Changed from var(--color-black-2)
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 1.5rem;
