@@ -119,6 +119,30 @@
     "boxers": "Boxeurs",
     "no_loaded_coaches": "Aucun entraîneur avec 50+ boxeurs",
     "no_available_coaches": "Aucun entraîneur disponible"
+  },
+  "notfound": {
+    "title": "Page Non Trouvée",
+    "message": "Oups ! La page que vous recherchez n'existe pas ou a été déplacée.",
+    "go_home": "Retour à l'Accueil"
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "contact": "Contact",
+      "signin": "Connexion"
+    },
+    "hero": {
+      "title_line1": "Formez des Champions,",
+      "title_line2": "Gagnez des Combats",
+      "subtitle": "Votre plateforme complète pour gérer les boxeurs, suivre les progrès et dominer le ring",
+      "cta": "Explorer"
+    },
+    "footer": {
+      "copyright": "© {{year}} Zephyr. Tous droits réservés.",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "twitter": "Twitter"
+    }
   }
-
 }

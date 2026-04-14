@@ -1,0 +1,164 @@
+/* =======================
+   NOT FOUND PAGE STYLES
+   ======================= */
+
+/* 🔥 BUTTON STYLES */
+.back-btn {
+  background-color: transparent;
+  color: var(--color-white);
+  border: 1.5px solid var(--color-gray);
+  transition: all 0.25s ease;
+  transform: translateY(0);
+}
+
+.back-btn:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(229, 34, 52, 0.15);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(229, 34, 52, 0.1);
+}
+
+.home-btn {
+  background-color: var(--color-red);
+  color: var(--color-white);
+  transition: all 0.25s ease;
+  transform: translateY(0);
+}
+
+.home-btn:hover {
+  background-color: #ff2a3d;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(229, 34, 52, 0.25);
+}
+
+.home-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(229, 34, 52, 0.2);
+}
+
+/* =======================
+   STAGGERED ANIMATIONS
+   ======================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Main container animation */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Staggered animations for not found page */
+.logo-animate {
+  animation: slideDown 0.6s ease 0.05s both;
+}
+
+.notfound-number-animate {
+  animation: scaleIn 0.7s ease 0.1s both;
+}
+
+.title-animate {
+  animation: slideUp 0.6s ease 0.2s both;
+}
+
+.subtitle-animate {
+  animation: slideUp 0.6s ease 0.25s both;
+}
+
+.back-btn-animate {
+  animation: slideUp 0.6s ease 0.3s both;
+}
+
+.home-btn-animate {
+  animation: slideUp 0.6s ease 0.35s both;
+}
+
+.footer-animate {
+  animation: fadeIn 0.8s ease 0.45s both;
+}
+
+/* =======================
+   RESPONSIVE ADJUSTMENTS
+   ======================= */
+
+@media (max-width: 640px) {
+  .notfound-number-animate h1 {
+    font-size: 100px;
+  }
+  
+  .back-btn,
+  .home-btn {
+    width: 100%;
+  }
+}
+
+/* =======================
+   RTL SUPPORT
+   ======================= */
+
+.rtl .back-btn {
+  direction: rtl;
+}
+
+.rtl .back-btn::before {
+  content: "→";
+  margin-left: 8px;
+}
+
+.rtl .back-btn span {
+  display: none;
+}
+

@@ -112,5 +112,30 @@
     "boxers": "Boxers",
     "no_loaded_coaches": "No coaches with 50+ boxers",
     "no_available_coaches": "No coaches available"
+  },
+  "notfound": {
+    "title": "Page Not Found",
+    "message": "Oops! The page you're looking for doesn't exist or has been moved.",
+    "go_home": "Go Back Home"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "signin": "Sign In"
+    },
+    "hero": {
+      "title_line1": "Build Champions,",
+      "title_line2": "Win Fights",
+      "subtitle": "Your complete platform for managing boxers, tracking progress, and dominating the ring",
+      "cta": "Explore Now"
+    },
+    "footer": {
+      "copyright": "© {{year}} Zephyr. All rights reserved.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "twitter": "Twitter"
+    }
   }
 }
