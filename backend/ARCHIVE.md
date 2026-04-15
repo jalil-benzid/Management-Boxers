@@ -18,3 +18,9 @@ pip install email-validator
 
 docker build -t boxers-api .
 docker-compose up
+
+pip install fastapi-limiter redis
+
+
+may improve architecture:
+https://claude.ai/share/f4bccdc2-5934-4de9-9757-ce21e0695e4e
