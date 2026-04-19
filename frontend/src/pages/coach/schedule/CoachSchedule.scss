@@ -1,0 +1,413 @@
+// CoachSchedule.scss - Updated to remove layout padding
+@import "../../../styles/variables";
+
+.coach-home {
+  width: 100%;
+  background: var(--color-black);
+  min-height: 100vh;
+  animation: fadeIn 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  // Remove the layout's padding
+  margin: -20px; // This counteracts the .main-content padding: 20px
+  width: calc(100% + 40px); // Compensate for negative margin
+
+  // Loading state
+  &.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .loading-spinner {
+      color: var(--color-white);
+      font-size: 1rem;
+    }
+  }
+
+  // Header Section
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 0.75rem 1.5rem; // Added horizontal padding
+    animation: slideUp 0.6s ease 0.05s both;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .month-nav-btn {
+        background: transparent;
+        border: none;
+        color: var(--color-white);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      }
+
+      .current-month {
+        color: var(--color-white);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0.5rem;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .add-session-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--color-black-3);
+        border: 1px solid var(--color-black-4);
+        color: var(--color-white);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--color-black-4);
+          border-color: var(--color-gray);
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+
+  .header-divider {
+    height: 1px;
+    background: #2a2a2a;
+    width: 100%;
+    animation: slideUp 0.6s ease 0.1s both;
+  }
+
+  // Toggle Switch
+  .toggle-switch {
+    display: flex;
+    background: var(--color-black-3);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+
+    .toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-gray);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.375rem 0.875rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      &:hover {
+        color: var(--color-white);
+      }
+
+      &.active {
+        background: var(--color-black-4);
+        color: var(--color-white);
+      }
+    }
+  }
+
+  // Calendar Wrapper - No padding/margin, starts immediately after divider
+  .calendar-wrapper {
+    width: 100%;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  // Calendar Grid - Full width, starts right after divider
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+  }
+
+  // Calendar Day Cell
+  .calendar-day {
+    background: var(--color-black);
+    min-height: 140px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-right: 1px solid var(--color-black-3);
+    border-bottom: 1px solid var(--color-black-3);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    // Remove border from last column
+    &:nth-child(7n) {
+      border-right: none;
+    }
+
+    // Day header for first row (Sun 1, Mon 2, etc.) - Top left positioning
+    .day-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+
+      .week-day-name {
+        color: var(--color-white);
+        font-size: 0.7rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .day-number {
+        color: var(--color-white);
+        font-size: 0.7rem;
+        font-weight: 400;
+      }
+    }
+
+    // Day number only for other rows - Top left positioning
+    .day-number-only {
+      color: var(--color-white);
+      font-size: 0.7rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+
+    // Content area
+    .day-content {
+      flex: 1;
+      
+      &.other-month {
+        opacity: 0.4;
+      }
+    }
+
+    .sessions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .session-item {
+      background: var(--color-red);
+      border-radius: 4px;
+      padding: 0.375rem 0.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #c41a23;
+        transform: translateX(2px);
+      }
+
+      .session-title {
+        color: var(--color-white);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+
+      .session-time {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.65rem;
+        margin-top: 0.125rem;
+      }
+    }
+
+    .more-sessions-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-gray);
+      font-size: 0.7rem;
+      padding: 0.25rem 0;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+
+      &:hover {
+        color: var(--color-white);
+      }
+    }
+  }
+
+  // Daily View Wrapper - NO MARGINS
+  .daily-view-wrapper {
+    width: 100%;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  // Daily Timeline - NO MARGINS
+  .daily-timeline {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 120px);
+    min-height: 600px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  // Hour Labels
+  .hour-labels {
+    width: 70px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 0 0 0.5rem; // Small left padding
+
+    .hour-label {
+      height: calc(100% / 24);
+      color: var(--color-gray);
+      font-size: 0.7rem;
+      padding-right: 0.75rem;
+      text-align: right;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      position: relative;
+      margin: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  // Timeline Grid - NO MARGINS
+  .timeline-grid {
+    flex: 1;
+    position: relative;
+    margin: 0;
+    padding: 0 0.5rem 0 0; // Small right padding
+
+    .hour-line {
+      height: calc(100% / 24);
+      border-top: 1px solid var(--color-black-3);
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      
+      &:first-child {
+        border-top: none;
+      }
+    }
+
+    // Daily Session Item
+    .daily-session-item {
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: var(--color-red);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      margin: 0 0.5rem 0 0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      overflow: hidden;
+      min-height: 40px;
+
+      &:hover {
+        background: #c41a23;
+        transform: scaleX(1.01);
+      }
+
+      .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.5rem;
+
+        .session-name {
+          color: var(--color-white);
+          font-size: 0.875rem;
+          font-weight: 500;
+          line-height: 1.3;
+        }
+
+        .session-duration {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.7rem;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    .no-sessions-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--color-gray);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+  }
+}
+
+// Responsive adjustments for mobile
+@media (max-width: 768px) {
+  .coach-home {
+    margin: -1rem; // Counteract mobile padding: 1rem
+    width: calc(100% + 2rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .coach-home {
+    margin: -0.75rem; // Counteract small mobile padding: 0.75rem
+    width: calc(100% + 1.5rem);
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
