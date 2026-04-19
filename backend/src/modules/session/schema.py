@@ -25,11 +25,11 @@ class SessionResponse(BaseModel):
     start_time: time
     end_time: time
     schedule_id: UUID
-    exercises: List['ExerciseResponse'] = []
+    exercises: List['ExerciseResponse'] = []  # String forward reference
 
     model_config = {
         "from_attributes": True,
-        "json_encoders": {UUID: str, time: lambda t: t.strftime('%H:%M')},
+        "json_encoders": {UUID: str},
     }
 
 class SessionResponseModel(BaseModel):
@@ -42,3 +42,12 @@ class SessionListResponseModel(BaseModel):
     message: str
     data: List[SessionResponse]
 
+
+# IMPORTANT: Rebuild the model after ExerciseResponse is imported
+# This goes at the BOTTOM of the file, after the class definitions
+def _rebuild_models():
+    from src.modules.exercise.schema import ExerciseResponse
+    SessionListResponseModel.model_rebuild()
+    SessionResponse.model_rebuild()
+
+_rebuild_models()

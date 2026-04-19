@@ -3,6 +3,8 @@ from sqlalchemy import Column, String, Date, Time, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from src.db.base import Base
+from src.modules.session.schema import SessionListResponseModel
+from src.modules.exercise.schema import ExerciseResponse
 
 class Session(Base):
     __tablename__ = "sessions"
@@ -17,4 +19,5 @@ class Session(Base):
     schedule = relationship("Schedule", backref="sessions")
     exercises = relationship("Exercise", back_populates="session", cascade="all, delete-orphan")  # UPDATE THIS
 
-    
+from src.modules.exercise.schema import ExerciseResponse
+SessionListResponseModel.model_rebuild()
