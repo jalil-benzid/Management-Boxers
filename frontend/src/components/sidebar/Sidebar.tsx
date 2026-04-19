@@ -29,7 +29,7 @@ interface SidebarProps {
 const menuItems = {
   coach: [
     {
-      label: "sidebar.dashboard",
+      label: "sidebar.Home",
       path: "/coach/dashboard",
       icon: LayoutDashboard,
     },

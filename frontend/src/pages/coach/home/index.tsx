@@ -1,7 +1,465 @@
+// CoachHome.tsx
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import "./CoachHome.scss";
+
+interface Session {
+  id: string;
+  title: string;
+  startTime: string;
+  endTime: string;
+  date: string;
+}
+
+interface DaySession {
+  date: Date;
+  sessions: Session[];
+  isCurrentMonth: boolean;
+}
+
 export default function CoachHome() {
+  const { t } = useTranslation();
+  const [viewType, setViewType] = useState<"monthly" | "daily">("monthly");
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 0)); // January 2026
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Mock sessions data with examples across different days
+  useEffect(() => {
+    const fetchSessions = async () => {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        const mockSessions: Session[] = [
+          // January 1 - 4 sessions
+          {
+            id: "1",
+            title: "Session 1",
+            startTime: "10:00",
+            endTime: "12:00",
+            date: "2026-01-01",
+          },
+          {
+            id: "2",
+            title: "Session 2",
+            startTime: "13:00",
+            endTime: "15:00",
+            date: "2026-01-01",
+          },
+          {
+            id: "3",
+            title: "Session 3",
+            startTime: "15:30",
+            endTime: "17:30",
+            date: "2026-01-01",
+          },
+          {
+            id: "4",
+            title: "Session 4",
+            startTime: "18:00",
+            endTime: "20:00",
+            date: "2026-01-01",
+          },
+          // January 5 - 1 session
+          {
+            id: "5",
+            title: "Morning Training",
+            startTime: "09:00",
+            endTime: "11:00",
+            date: "2026-01-05",
+          },
+          // January 10 - 2 sessions
+          {
+            id: "6",
+            title: "Session 1",
+            startTime: "10:00",
+            endTime: "12:00",
+            date: "2026-01-10",
+          },
+          {
+            id: "7",
+            title: "Session 2",
+            startTime: "14:00",
+            endTime: "16:00",
+            date: "2026-01-10",
+          },
+          // January 15 - 3 sessions
+          {
+            id: "8",
+            title: "Session 1",
+            startTime: "08:00",
+            endTime: "10:00",
+            date: "2026-01-15",
+          },
+          {
+            id: "9",
+            title: "Session 2",
+            startTime: "11:00",
+            endTime: "13:00",
+            date: "2026-01-15",
+          },
+          {
+            id: "10",
+            title: "Session 3",
+            startTime: "15:00",
+            endTime: "17:00",
+            date: "2026-01-15",
+          },
+          // January 20 - 5 sessions
+          {
+            id: "11",
+            title: "Session 1",
+            startTime: "09:00",
+            endTime: "10:30",
+            date: "2026-01-20",
+          },
+          {
+            id: "12",
+            title: "Session 2",
+            startTime: "11:00",
+            endTime: "12:30",
+            date: "2026-01-20",
+          },
+          {
+            id: "13",
+            title: "Session 3",
+            startTime: "13:00",
+            endTime: "14:30",
+            date: "2026-01-20",
+          },
+          {
+            id: "14",
+            title: "Session 4",
+            startTime: "15:00",
+            endTime: "16:30",
+            date: "2026-01-20",
+          },
+          {
+            id: "15",
+            title: "Session 5",
+            startTime: "17:00",
+            endTime: "18:30",
+            date: "2026-01-20",
+          },
+          // January 25 - 1 session
+          {
+            id: "16",
+            title: "Evening Session",
+            startTime: "19:00",
+            endTime: "21:00",
+            date: "2026-01-25",
+          },
+          // February 1 (next month) - 2 sessions
+          {
+            id: "17",
+            title: "Session 1",
+            startTime: "10:00",
+            endTime: "12:00",
+            date: "2026-02-01",
+          },
+          {
+            id: "18",
+            title: "Session 2",
+            startTime: "14:00",
+            endTime: "16:00",
+            date: "2026-02-01",
+          },
+          // December 29 (previous month) - 1 session
+          {
+            id: "19",
+            title: "Year End Session",
+            startTime: "10:00",
+            endTime: "12:00",
+            date: "2025-12-29",
+          },
+        ];
+        setSessions(mockSessions);
+        setLoading(false);
+      }, 500);
+    };
+
+    fetchSessions();
+  }, [currentDate]);
+
+  const handlePreviousMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
+  };
+
+  const handleAddSession = () => {
+    // Navigate to add session page or open modal
+    console.log("Add session clicked");
+  };
+
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setViewType("daily");
+  };
+
+  const handleMoreSessionsClick = (date: Date, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedDate(date);
+    setViewType("daily");
+  };
+
+  const getDaysInMonth = (date: Date): DaySession[] => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const endDate = new Date(lastDay);
+    endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()));
+    
+    const days: DaySession[] = [];
+    const currentDateCopy = new Date(startDate);
+    
+    while (currentDateCopy <= endDate) {
+      const dateStr = currentDateCopy.toISOString().split('T')[0];
+      const daySessions = sessions.filter(s => s.date === dateStr);
+      
+      days.push({
+        date: new Date(currentDateCopy),
+        sessions: daySessions,
+        isCurrentMonth: currentDateCopy.getMonth() === month,
+      });
+      
+      currentDateCopy.setDate(currentDateCopy.getDate() + 1);
+    }
+    
+    return days;
+  };
+
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const days = getDaysInMonth(currentDate);
+
+  // Check if a day is in the first row (first 7 days)
+  const isFirstRow = (index: number) => index < 7;
+
+  // Get sessions for selected date
+  const getSessionsForSelectedDate = () => {
+    if (!selectedDate) return [];
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    return sessions.filter(s => s.date === dateStr);
+  };
+
+  // Calculate session position in daily view
+  const calculateSessionPosition = (startTime: string, endTime: string) => {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    
+    const startPosition = startHour + (startMinute / 60);
+    const endPosition = endHour + (endMinute / 60);
+    const duration = endPosition - startPosition;
+    
+    return {
+      top: `${(startPosition / 24) * 100}%`,
+      height: `${(duration / 24) * 100}%`,
+    };
+  };
+
+  // Format time for display
+  const formatSessionTime = (startTime: string, endTime: string) => {
+    const formatTime = (time: string) => {
+      const [hour, minute] = time.split(':');
+      const h = parseInt(hour);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const displayHour = h % 12 || 12;
+      return `${displayHour}:${minute} ${ampm}`;
+    };
+    
+    return `${formatTime(startTime)} - ${formatTime(endTime)}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="coach-home loading">
+        <div className="loading-spinner">Loading calendar...</div>
+      </div>
+    );
+  }
+
+  // If no date is selected for daily view, default to current date
+  const displayDate = selectedDate || currentDate;
+  const selectedDateSessions = getSessionsForSelectedDate();
+
   return (
-    <div className="min-h-screen flex items-center justify-center text-white">
-      <h1>Coach Home</h1>
+    <div className="coach-home">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="header-left">
+          {viewType === "monthly" ? (
+            <>
+              <button className="month-nav-btn" onClick={handlePreviousMonth}>
+                <ChevronLeft size={20} />
+              </button>
+              <button className="month-nav-btn" onClick={handleNextMonth}>
+                <ChevronRight size={20} />
+              </button>
+              <h2 className="current-month">
+                {monthNames[currentDate.getMonth()]}, {currentDate.getFullYear()}
+              </h2>
+            </>
+          ) : (
+            <>
+              <button className="month-nav-btn" onClick={() => setViewType("monthly")}>
+                <ChevronLeft size={20} />
+              </button>
+              <h2 className="current-month">
+                {monthNames[displayDate.getMonth()]} {displayDate.getDate()}, {displayDate.getFullYear()}
+              </h2>
+            </>
+          )}
+        </div>
+        
+        <div className="header-right">
+          <button className="add-session-btn" onClick={handleAddSession}>
+            <Plus size={18} />
+            <span>Add Session</span>
+          </button>
+          
+          <div className="toggle-switch">
+            <button
+              className={`toggle-btn ${viewType === "monthly" ? "active" : ""}`}
+              onClick={() => setViewType("monthly")}
+            >
+              Monthly
+            </button>
+            <button
+              className={`toggle-btn ${viewType === "daily" ? "active" : ""}`}
+              onClick={() => setViewType("daily")}
+            >
+              Daily
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="header-divider" />
+
+      {/* Calendar View */}
+      {viewType === "monthly" && (
+        <div className="calendar-wrapper">
+          <div className="calendar-grid">
+            {days.map((day, index) => (
+              <div
+                key={index}
+                className="calendar-day"
+                onClick={() => handleDayClick(day.date)}
+              >
+                {isFirstRow(index) && (
+                  <div className="day-header">
+                    <span className="week-day-name">{weekDays[index % 7]}</span>
+                    <span className="day-number">{day.date.getDate()}</span>
+                  </div>
+                )}
+                
+                {!isFirstRow(index) && (
+                  <div className="day-number-only">{day.date.getDate()}</div>
+                )}
+                
+                <div className={`day-content ${!day.isCurrentMonth ? "other-month" : ""}`}>
+                  {day.sessions.length > 0 && (
+                    <div className="sessions-container">
+                      {day.sessions.slice(0, 2).map((session) => (
+                        <div key={session.id} className="session-item">
+                          <div className="session-title">{session.title}</div>
+                          <div className="session-time">
+                            {session.startTime} - {session.endTime}
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {day.sessions.length > 2 && (
+                        <button
+                          className="more-sessions-btn"
+                          onClick={(e) => handleMoreSessionsClick(day.date, e)}
+                        >
+                          +{day.sessions.length - 2} more session{day.sessions.length - 2 > 1 ? 's' : ''}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Daily View */}
+      {viewType === "daily" && (
+        <div className="daily-view-wrapper">
+          <div className="daily-timeline">
+            {/* Hour labels */}
+            <div className="hour-labels">
+              {Array.from({ length: 24 }, (_, i) => {
+                const hour = i;
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour % 12 || 12;
+                return (
+                  <div key={i} className="hour-label">
+                    {displayHour}:00 {ampm}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Timeline grid with sessions */}
+            <div className="timeline-grid">
+              {/* Hour lines */}
+              {Array.from({ length: 24 }, (_, i) => (
+                <div key={i} className="hour-line"></div>
+              ))}
+
+              {/* Sessions */}
+              {selectedDateSessions.map((session) => {
+                const position = calculateSessionPosition(session.startTime, session.endTime);
+                return (
+                  <div
+                    key={session.id}
+                    className="daily-session-item"
+                    style={{
+                      top: position.top,
+                      height: position.height,
+                    }}
+                  >
+                    <div className="session-header">
+                      <span className="session-name">{session.title}</span>
+                      <span className="session-duration">
+                        {formatSessionTime(session.startTime, session.endTime)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* No sessions message */}
+              {selectedDateSessions.length === 0 && (
+                <div className="no-sessions-message">
+                  No sessions scheduled for this day
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+
