@@ -1,7 +1,7 @@
 // CoachSchedule.tsx
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X, Calendar, Clock } from "lucide-react";
 import "./CoachSchedule.scss";
 
 interface Session {
@@ -10,6 +10,13 @@ interface Session {
   startTime: string;
   endTime: string;
   date: string;
+  exercises?: Exercise[];
+}
+
+interface Exercise {
+  id: string;
+  name: string;
+  description: string;
 }
 
 interface DaySession {
@@ -22,9 +29,23 @@ export default function CoachSchedule() {
   const { t } = useTranslation();
   const [viewType, setViewType] = useState<"monthly" | "daily">("monthly");
   const [currentDate, setCurrentDate] = useState(new Date(2026, 0)); // January 2026
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2026, 0, 1)); // Initialize with a date
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2026, 0, 1));
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sessionName, setSessionName] = useState("");
+  const [selectedDateForm, setSelectedDateForm] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:00");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  
+  // Exercises state
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [isAddingExercise, setIsAddingExercise] = useState(false);
+  const [currentExercise, setCurrentExercise] = useState({ name: "", description: "" });
+  const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
 
   // Mock sessions data with examples across different days
   useEffect(() => {
@@ -181,7 +202,7 @@ export default function CoachSchedule() {
     };
 
     fetchSessions();
-  }, []); // Remove currentDate dependency to prevent re-fetching
+  }, []);
 
   const handlePreviousMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -195,7 +216,6 @@ export default function CoachSchedule() {
     const prevDay = new Date(selectedDate);
     prevDay.setDate(prevDay.getDate() - 1);
     setSelectedDate(prevDay);
-    // Also update currentDate to match the month/year of the new selected date
     setCurrentDate(new Date(prevDay));
   };
 
@@ -203,13 +223,34 @@ export default function CoachSchedule() {
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
     setSelectedDate(nextDay);
-    // Also update currentDate to match the month/year of the new selected date
     setCurrentDate(new Date(nextDay));
   };
 
   const handleAddSession = () => {
-    // Navigate to add session page or open modal
-    console.log("Add session clicked");
+    setIsSidebarOpen(true);
+    // Set selected date to current month's first day when opening from monthly view
+    if (viewType === "monthly") {
+      setSelectedDateForm(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+    } else {
+      setSelectedDateForm(new Date(selectedDate));
+    }
+  };
+
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setSessionName("");
+    setSelectedDateForm(new Date());
+    setStartTime("09:00");
+    setEndTime("10:00");
+    setExercises([]);
+    setIsAddingExercise(false);
+    setCurrentExercise({ name: "", description: "" });
+    setEditingExerciseId(null);
+    setShowDatePicker(false);
   };
 
   const handleDayClick = (date: Date) => {
@@ -221,6 +262,61 @@ export default function CoachSchedule() {
     e.stopPropagation();
     setSelectedDate(date);
     setViewType("daily");
+  };
+
+  const handleAddExercise = () => {
+    if (currentExercise.name.trim() && currentExercise.description.trim()) {
+      const newExercise: Exercise = {
+        id: Date.now().toString(),
+        name: currentExercise.name,
+        description: currentExercise.description,
+      };
+      setExercises([...exercises, newExercise]);
+      setCurrentExercise({ name: "", description: "" });
+      setIsAddingExercise(false);
+    }
+  };
+
+  const handleCancelExercise = () => {
+    setCurrentExercise({ name: "", description: "" });
+    setIsAddingExercise(false);
+    setEditingExerciseId(null);
+  };
+
+  const handleEditExercise = (exercise: Exercise) => {
+    setCurrentExercise({ name: exercise.name, description: exercise.description });
+    setEditingExerciseId(exercise.id);
+    setIsAddingExercise(true);
+  };
+
+  const handleUpdateExercise = () => {
+    if (currentExercise.name.trim() && currentExercise.description.trim() && editingExerciseId) {
+      setExercises(exercises.map(ex => 
+        ex.id === editingExerciseId 
+          ? { ...ex, name: currentExercise.name, description: currentExercise.description }
+          : ex
+      ));
+      setCurrentExercise({ name: "", description: "" });
+      setIsAddingExercise(false);
+      setEditingExerciseId(null);
+    }
+  };
+
+  const handleDeleteExercise = (exerciseId: string) => {
+    setExercises(exercises.filter(ex => ex.id !== exerciseId));
+  };
+
+  const handleCreateSession = () => {
+    const newSession: Session = {
+      id: Date.now().toString(),
+      title: sessionName,
+      startTime: startTime,
+      endTime: endTime,
+      date: selectedDateForm.toISOString().split('T')[0],
+      exercises: exercises,
+    };
+    setSessions([...sessions, newSession]);
+    handleCloseSidebar();
   };
 
   const getDaysInMonth = (date: Date): DaySession[] => {
@@ -263,16 +359,13 @@ export default function CoachSchedule() {
 
   const days = getDaysInMonth(currentDate);
 
-  // Check if a day is in the first row (first 7 days)
   const isFirstRow = (index: number) => index < 7;
 
-  // Get sessions for selected date
   const getSessionsForSelectedDate = () => {
     const dateStr = selectedDate.toISOString().split('T')[0];
     return sessions.filter(s => s.date === dateStr);
   };
 
-  // Calculate session position in daily view
   const calculateSessionPosition = (startTime: string, endTime: string) => {
     const [startHour, startMinute] = startTime.split(':').map(Number);
     const [endHour, endMinute] = endTime.split(':').map(Number);
@@ -287,7 +380,6 @@ export default function CoachSchedule() {
     };
   };
 
-  // Format time for display
   const formatSessionTime = (startTime: string, endTime: string) => {
     const formatTime = (time: string) => {
       const [hour, minute] = time.split(':');
@@ -298,6 +390,22 @@ export default function CoachSchedule() {
     };
     
     return `${formatTime(startTime)} - ${formatTime(endTime)}`;
+  };
+
+  const formatDate = (date: Date) => {
+    return `${monthNames[date.getMonth()].slice(0, 3)} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  const generateDateOptions = () => {
+    const dates = [];
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      dates.push(new Date(year, month, i));
+    }
+    return dates;
   };
 
   if (loading) {
@@ -311,170 +419,327 @@ export default function CoachSchedule() {
   const selectedDateSessions = getSessionsForSelectedDate();
 
   return (
-    <div className="coach-home">
-      {/* Header */}
-      <div className="dashboard-header">
-        <div className="header-left">
-          {viewType === "monthly" ? (
-            <>
-              <button className="month-nav-btn" onClick={handlePreviousMonth}>
-                <ChevronLeft size={20} />
-              </button>
-              <button className="month-nav-btn" onClick={handleNextMonth}>
-                <ChevronRight size={20} />
-              </button>
-              <h2 className="current-month">
-                {monthNames[currentDate.getMonth()]}, {currentDate.getFullYear()}
-              </h2>
-            </>
-          ) : (
-            <>
-              <button className="month-nav-btn" onClick={handlePreviousDay}>
-                <ChevronLeft size={20} />
-              </button>
-              <button className="month-nav-btn" onClick={handleNextDay}>
-                <ChevronRight size={20} />
-              </button>
-              <h2 className="current-month">
-                {monthNames[selectedDate.getMonth()]} {selectedDate.getDate()}, {selectedDate.getFullYear()}
-              </h2>
-            </>
-          )}
-        </div>
+    <>
+      <div className={`coach-home ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        {/* Overlay */}
+        {isSidebarOpen && <div className="overlay" onClick={handleCloseSidebar} />}
         
-        <div className="header-right">
-          <button className="add-session-btn" onClick={handleAddSession}>
-            <Plus size={18} />
-            <span>Add Session</span>
-          </button>
+        {/* Header */}
+        <div className="dashboard-header">
+          <div className="header-left">
+            {viewType === "monthly" ? (
+              <>
+                <button className="month-nav-btn" onClick={handlePreviousMonth}>
+                  <ChevronLeft size={20} />
+                </button>
+                <button className="month-nav-btn" onClick={handleNextMonth}>
+                  <ChevronRight size={20} />
+                </button>
+                <h2 className="current-month">
+                  {monthNames[currentDate.getMonth()]}, {currentDate.getFullYear()}
+                </h2>
+              </>
+            ) : (
+              <>
+                <button className="month-nav-btn" onClick={handlePreviousDay}>
+                  <ChevronLeft size={20} />
+                </button>
+                <button className="month-nav-btn" onClick={handleNextDay}>
+                  <ChevronRight size={20} />
+                </button>
+                <h2 className="current-month">
+                  {monthNames[selectedDate.getMonth()]} {selectedDate.getDate()}, {selectedDate.getFullYear()}
+                </h2>
+              </>
+            )}
+          </div>
           
-          <div className="toggle-switch">
-            <button
-              className={`toggle-btn ${viewType === "monthly" ? "active" : ""}`}
-              onClick={() => setViewType("monthly")}
-            >
-              Monthly
+          <div className="header-right">
+            <button className="add-session-btn" onClick={handleAddSession}>
+              <Plus size={18} />
+              <span>Add Session</span>
             </button>
-            <button
-              className={`toggle-btn ${viewType === "daily" ? "active" : ""}`}
-              onClick={() => setViewType("daily")}
-            >
-              Daily
-            </button>
+            
+            <div className="toggle-switch">
+              <button
+                className={`toggle-btn ${viewType === "monthly" ? "active" : ""}`}
+                onClick={() => setViewType("monthly")}
+              >
+                Monthly
+              </button>
+              <button
+                className={`toggle-btn ${viewType === "daily" ? "active" : ""}`}
+                onClick={() => setViewType("daily")}
+              >
+                Daily
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="header-divider" />
+        <div className="header-divider" />
 
-      {/* Calendar View */}
-      {viewType === "monthly" && (
-        <div className="calendar-wrapper">
-          <div className="calendar-grid">
-            {days.map((day, index) => (
-              <div
-                key={index}
-                className="calendar-day"
-                onClick={() => handleDayClick(day.date)}
-              >
-                {isFirstRow(index) && (
-                  <div className="day-header">
-                    <span className="week-day-name">{weekDays[index % 7]}</span>
-                    <span className="day-number">{day.date.getDate()}</span>
-                  </div>
-                )}
-                
-                {!isFirstRow(index) && (
-                  <div className="day-number-only">{day.date.getDate()}</div>
-                )}
-                
-                <div className={`day-content ${!day.isCurrentMonth ? "other-month" : ""}`}>
-                  {day.sessions.length > 0 && (
-                    <div className="sessions-container">
-                      {day.sessions.slice(0, 2).map((session) => (
-                        <div key={session.id} className="session-item">
-                          <div className="session-title">{session.title}</div>
-                          <div className="session-time">
-                            {session.startTime} - {session.endTime}
-                          </div>
-                        </div>
-                      ))}
-                      
-                      {day.sessions.length > 2 && (
-                        <button
-                          className="more-sessions-btn"
-                          onClick={(e) => handleMoreSessionsClick(day.date, e)}
-                        >
-                          +{day.sessions.length - 2} more session{day.sessions.length - 2 > 1 ? 's' : ''}
-                        </button>
-                      )}
+        {/* Calendar View */}
+        {viewType === "monthly" && (
+          <div className="calendar-wrapper">
+            <div className="calendar-grid">
+              {days.map((day, index) => (
+                <div
+                  key={index}
+                  className="calendar-day"
+                  onClick={() => handleDayClick(day.date)}
+                >
+                  {isFirstRow(index) && (
+                    <div className="day-header">
+                      <span className="week-day-name">{weekDays[index % 7]}</span>
+                      <span className="day-number">{day.date.getDate()}</span>
                     </div>
                   )}
+                  
+                  {!isFirstRow(index) && (
+                    <div className="day-number-only">{day.date.getDate()}</div>
+                  )}
+                  
+                  <div className={`day-content ${!day.isCurrentMonth ? "other-month" : ""}`}>
+                    {day.sessions.length > 0 && (
+                      <div className="sessions-container">
+                        {day.sessions.slice(0, 2).map((session) => (
+                          <div key={session.id} className="session-item">
+                            <div className="session-title">{session.title}</div>
+                            <div className="session-time">
+                              {session.startTime} - {session.endTime}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {day.sessions.length > 2 && (
+                          <button
+                            className="more-sessions-btn"
+                            onClick={(e) => handleMoreSessionsClick(day.date, e)}
+                          >
+                            +{day.sessions.length - 2} more session{day.sessions.length - 2 > 1 ? 's' : ''}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Daily View */}
-      {viewType === "daily" && (
-        <div className="daily-view-wrapper">
-          <div className="daily-timeline">
-            {/* Hour labels */}
-            <div className="hour-labels">
-              {Array.from({ length: 24 }, (_, i) => {
-                const hour = i;
-                const ampm = hour >= 12 ? 'PM' : 'AM';
-                const displayHour = hour % 12 || 12;
-                return (
-                  <div key={i} className="hour-label">
-                    {displayHour}:00 {ampm}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Timeline grid with sessions */}
-            <div className="timeline-grid">
-              {/* Hour lines */}
-              {Array.from({ length: 24 }, (_, i) => (
-                <div key={i} className="hour-line"></div>
               ))}
+            </div>
+          </div>
+        )}
 
-              {/* Sessions */}
-              {selectedDateSessions.map((session) => {
-                const position = calculateSessionPosition(session.startTime, session.endTime);
-                return (
-                  <div
-                    key={session.id}
-                    className="daily-session-item"
-                    style={{
-                      top: position.top,
-                      height: position.height,
-                    }}
-                  >
-                    <div className="session-header">
-                      <span className="session-name">{session.title}</span>
-                      <span className="session-duration">
-                        {formatSessionTime(session.startTime, session.endTime)}
-                      </span>
+        {/* Daily View */}
+        {viewType === "daily" && (
+          <div className="daily-view-wrapper">
+            <div className="daily-timeline">
+              <div className="hour-labels">
+                {Array.from({ length: 24 }, (_, i) => {
+                  const hour = i;
+                  const ampm = hour >= 12 ? 'PM' : 'AM';
+                  const displayHour = hour % 12 || 12;
+                  return (
+                    <div key={i} className="hour-label">
+                      {displayHour}:00 {ampm}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
 
-              {/* No sessions message */}
-              {selectedDateSessions.length === 0 && (
-                <div className="no-sessions-message">
-                  No sessions scheduled for this day
+              <div className="timeline-grid">
+                {Array.from({ length: 24 }, (_, i) => (
+                  <div key={i} className="hour-line"></div>
+                ))}
+
+                {selectedDateSessions.map((session) => {
+                  const position = calculateSessionPosition(session.startTime, session.endTime);
+                  return (
+                    <div
+                      key={session.id}
+                      className="daily-session-item"
+                      style={{
+                        top: position.top,
+                        height: position.height,
+                      }}
+                    >
+                      <div className="session-header">
+                        <span className="session-name">{session.title}</span>
+                        <span className="session-duration">
+                          {formatSessionTime(session.startTime, session.endTime)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {selectedDateSessions.length === 0 && (
+                  <div className="no-sessions-message">
+                    No sessions scheduled for this day
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar */}
+      <div className={`session-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <button className="close-btn" onClick={handleCloseSidebar}>
+            <X size={20} />
+          </button>
+          <h2 className="sidebar-title">New Session</h2>
+        </div>
+
+        <div className="sidebar-content">
+          {/* Session Name */}
+          <div className="form-group">
+            <label className="form-label">Session name</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter session name"
+              value={sessionName}
+              onChange={(e) => setSessionName(e.target.value)}
+            />
+          </div>
+
+          {/* Date and Time Row */}
+          <div className="datetime-row">
+            <div className="date-picker-wrapper">
+              <button 
+                className="datetime-box"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+              >
+                <Calendar size={18} />
+                <span>{formatDate(selectedDateForm)}</span>
+              </button>
+              {showDatePicker && (
+                <div className="date-picker-dropdown">
+                  {generateDateOptions().map((date) => (
+                    <button
+                      key={date.toISOString()}
+                      className="date-option"
+                      onClick={() => {
+                        setSelectedDateForm(date);
+                        setShowDatePicker(false);
+                      }}
+                    >
+                      {formatDate(date)}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
+            
+            <div className="divider-vertical" />
+            
+            <div className="time-box">
+              <Clock size={18} />
+              <input
+                type="time"
+                className="time-input"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
+            
+            <div className="time-box">
+              <Clock size={18} />
+              <input
+                type="time"
+                className="time-input"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Exercises Section */}
+          <div className="exercises-section">
+            <h3 className="section-title">Exercises</h3>
+            
+            {/* Exercise Cards */}
+            {exercises.map((exercise) => (
+              <div key={exercise.id} className="exercise-card">
+                <div className="exercise-card-header">
+                  <h4 className="exercise-name">{exercise.name}</h4>
+                  <div className="exercise-actions">
+                    <button 
+                      className="edit-btn"
+                      onClick={() => handleEditExercise(exercise)}
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      className="delete-btn"
+                      onClick={() => handleDeleteExercise(exercise.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                <p className="exercise-description">{exercise.description}</p>
+              </div>
+            ))}
+
+            {/* Add Exercise Form */}
+            {isAddingExercise ? (
+              <div className="add-exercise-form">
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Exercise name"
+                  value={currentExercise.name}
+                  onChange={(e) => setCurrentExercise({ ...currentExercise, name: e.target.value })}
+                />
+                <textarea
+                  className="form-textarea"
+                  placeholder="Exercise description"
+                  value={currentExercise.description}
+                  onChange={(e) => setCurrentExercise({ ...currentExercise, description: e.target.value })}
+                  rows={3}
+                />
+                <div className="exercise-form-actions">
+                  <button className="cancel-exercise-btn" onClick={handleCancelExercise}>
+                    Cancel
+                  </button>
+                  <button 
+                    className="add-exercise-btn"
+                    onClick={editingExerciseId ? handleUpdateExercise : handleAddExercise}
+                  >
+                    {editingExerciseId ? 'Update' : 'Add'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                className="add-exercise-dashed-btn"
+                onClick={() => setIsAddingExercise(true)}
+              >
+                <Plus size={18} />
+                <span>Add Exercise</span>
+              </button>
+            )}
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Sidebar Footer */}
+        <div className="sidebar-footer">
+          <button className="cancel-btn" onClick={handleCloseSidebar}>
+            Cancel
+          </button>
+          <button 
+            className="create-btn"
+            onClick={handleCreateSession}
+            disabled={!sessionName.trim()}
+          >
+            Create Session
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 
