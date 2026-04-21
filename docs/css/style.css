@@ -1,0 +1,381 @@
+/*--Global Reset --*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ══════════════════════════════
+   LOGIN PAGE
+══════════════════════════════ */
+
+/*--Page Background--*/
+
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container{ 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 200px;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.logo img {
+    width: 50px;
+}
+.logo span {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/*--login box--*/
+
+.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 320px;
+}
+
+.login-box h2 {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.input-group input {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: #e63946;
+}
+
+
+.input-group select {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.input-group select:focus {
+  border-color: #e63946;
+}
+
+
+button {
+    background-color: #e63946;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #c1121f;
+}
+
+/* ══════════════════════════════
+Admin Dashboard
+══════════════════════════════ */
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #101010;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 18px;
+    border-right: 1px solid #2a2a2a;
+}
+
+.sidebar-logo {
+    display: flex;
+    flex-direction: row;
+    font-size: 20px;
+    font-weight: 400;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.sidebar-logo img {
+    height: 24px;
+}
+
+.sidebar-nav {
+
+    width: 197px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 14px 0px;
+    gap: 10px;
+
+}
+
+.nav-item-active {
+    color: #ffffff;
+    background-color: #2a2a2a;
+    border-radius: 7px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 6px;
+    gap: 7px;
+    margin: 0 -6px;
+}
+
+.nav-item {
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.nav-item, .nav-item-active {
+    text-decoration: none;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#admin-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background-color: #444;
+ 
+}
+
+.dropdown {
+    display: none;
+}
+
+.icon {
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 24px;
+  overflow-y: auto;
+  height: 100vh;
+  width: 100%;
+}
+
+.main-c {
+    width: 100%;
+}
+
+.topbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 25px;
+    border-bottom: #2a2a2a 1px solid;
+    margin-left: -24px;
+    margin-right: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+
+}
+
+#add-coach-btn {
+    width: 12%;
+    background-color: #2a2a2a;
+    color: white;
+    padding: 4px 4px;
+}
+
+.stats-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    border: #2a2a2a 1px solid;
+    border-radius: 16px;
+    padding: 20px 20px;
+    width: 23%;
+}
+.stat-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.stat-card > span {
+    font-weight: 500;
+    font-size: 50px;
+}
+
+.stat-card > p {
+    opacity: 0.7;   
+}
+
+.bottom-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    align-items: stretch;
+}
+
+.charts {
+    width: 60%;
+}
+.chart-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: #2a2a2a 1px solid;
+    border-radius: 16px;
+    padding: 20px 20px;
+    margin-bottom: 20px;
+}
+
+.chart-box > h3 {
+    border-bottom: #2a2a2a 1px solid;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    justify-content: center;
+}
+
+.coach-load {
+    border: #2a2a2a 1px solid;
+    border-radius: 16px;
+    width: 37%;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+}
+
+.coach-load-header {
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: #2a2a2a 1px solid;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.load-toggle {
+    width: 200px;
+    display: flex;
+    flex-direction: row;
+    background-color: #0a0a0a;
+    border: #2a2a2a 1px solid;
+    border-radius: 16px;
+    padding: 4px 8px;
+}
+
+.load-toggle button {
+    background-color: #0a0a0a;
+    padding: 4px 2px;
+}
+.active {
+    background-color: #2a2a2a !important;
+    border-radius: 8px;
+}
+
+.member-activity-header {
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: #2a2a2a 1px solid;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.chart-toggle {
+    width: 200px;
+    height: 35px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #0a0a0a;
+    border: #2a2a2a 1px solid;
+    border-radius: 16px;
+    padding: 4px 8px;
+}
+
+
+.chart-toggle button {
+    background-color: #0a0a0a;
+    padding: 4px 2px;
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zephyr - Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/4.0.0/uicons-solid-straight/css/uicons-solid-straight.css'>
+  </head>
+  <body class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <img src="../assets/logo.svg" alt="Zephyr Logo" />
+        <span>Zephyr</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item-active">
+          <span class="icon">
+            <i class="fi fi-ss-house-chimney"></i>
+          </span>
+          <span>Home</span>
+        </a>
+        <a href="coaches.html" class="nav-item">
+          <span class="icon">
+            <i class="fi fi-ss-user-coach"></i>
+          </span>
+          <span>Coaches</span>
+        </a>
+        <a href="admins.html" class="nav-item">
+          <span class="icon">
+            <i class="fi fi-ss-admin"></i>
+          </span>
+          <span>Admins</span>
+        </a>
+      </nav>
+
+      <!-- Bottom -->
+      <div class="sidebar-bottom">
+
+        <!-- Profile -->
+        <div class="profile-section">
+
+          <!-- Always visible -->
+          <div class="profile" id="profile-toggle">
+            <div id="admin-avatar"></div>
+            <span id="admin-name"></span>
+            <span class="arrow">▴</span>
+          </div>
+
+          <!-- Dropup — hidden by default -->
+          <div class="dropdown" id="profile-dropdown">
+            <a href="#" class="dropdown-item">Profile</a>
+            <a href="#" class="dropdown-item" id="logout-btn">Logout</a>
+          </div>
+
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <div class="main-c">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+          <h3>Dashboard</h3>
+          <button id="add-coach-btn">+ Add coach</button>
+        </div>
+        
+  
+        <!-- Stats Cards -->
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Total coaches</span>
+              <span class="icon">
+                <i class="fi fi-ss-user-coach"></i>
+              </span>
+            </div>
+            <span>8</span>
+            <h2 class="stat-number" id="total-coaches"></h2>
+            <p class="stat-desc">Active this season</p>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Total athletes</span>
+              <span class="icon">
+                <i class="fi fi-ss-boxing-glove"></i>
+              </span>
+            </div>
+            <span>8</span>
+            <h2 class="stat-number" id="total-athletes"></h2>
+            <p class="stat-desc">Registered & active</p>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>New this month</span>
+              <span class="icon">
+                <i class="fi fi-ss-user-add"></i>
+              </span>
+            </div>
+            <span>8</span>
+            <h2 class="stat-number" id="new-this-month"></h2>
+            <p class="stat-desc green" id="vs-last-month"></p>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Avg per coach</span>
+              <span class="icon">
+                <i class="fi fi-ss-tachometer-average"></i>
+              </span>
+            </div>
+            <span>8</span>
+            <h2 class="stat-number" id="avg-per-coach"></h2>
+            <p class="stat-desc">Athletes / coach</p>
+          </div>
+        </div>
+  
+        <!-- Charts + Coach Load -->
+        <div class="bottom-container">
+  
+          <!-- Charts -->
+          <div class="charts">
+            <div class="chart-box">
+              <h3>Coach recruited per month</h3>
+              <canvas id="barChart"></canvas>
+            </div>
+            <div class="chart-box">
+              <div class="member-activity-header">
+                <h3>Member Activity</h3>
+                <div class="chart-toggle">
+                  <button class="active">Monthly</button>
+                  <button>Weekly</button>
+                </div>
+              </div>
+              <canvas id="lineChart"></canvas>
+            </div>
+          </div>
+  
+          <!-- Coach Load -->
+          <div class="coach-load">
+            <div class="coach-load-header">
+              <h3>Coach Load</h3>
+              <div class="load-toggle">
+                <button class="active">Loaded</button>
+                <button>Available</button>
+              </div>
+            </div>
+            <div class="load-list" id="load-list">
+              <!-- JS will fill this dynamically -->
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/admin/dashboard.js"></script>
+  </body>
+</html>
