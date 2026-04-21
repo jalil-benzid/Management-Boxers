@@ -23,7 +23,7 @@ class BoxerResponse(BaseModel):
     @model_validator(mode="after")
     def build_picture_url(self):
         if self.picture:
-            self.picture = f"{settings.BASE_IMG_URL}/{self.picture}"
+            self.picture = f"{self.picture}" #{settings.BASE_IMG_URL}/
         return self
     
 
