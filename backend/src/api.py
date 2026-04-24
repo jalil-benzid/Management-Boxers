@@ -11,6 +11,7 @@ from src.modules.exercise.router import router as exercise_router
 from src.modules.attendance.router import router as attendance_router
 from src.modules.review.router import router as review_router
 from src.modules.analytics.admin.router import router as analytics_admin_router
+from src.modules.analytics.coach.router import router as analytics_coach_router
 
 
 api_router = APIRouter()
@@ -26,4 +27,6 @@ api_router.include_router(exercise_router, prefix="/sessions", tags=["Exercises"
 api_router.include_router(attendance_router, prefix="/sessions", tags=["Attendance"])
 api_router.include_router(review_router, prefix="/sessions", tags=["Reviews"])
 api_router.include_router(analytics_admin_router, prefix="/analytics/admin", tags=["Admin Analytics"])
+api_router.include_router(analytics_coach_router, prefix="/analytics/coach", tags=["Coach Analytics"])
+
 
