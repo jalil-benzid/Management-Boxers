@@ -14,7 +14,7 @@ from src.modules.rpe.rpe_controller import RPEController
 from src.middlewares.authorization import require_role
 from src.middlewares.authentication import get_current_user
 
-router = APIRouter(prefix="/rpe", tags=["RPE"])
+router = APIRouter()
 
 @router.post("/", response_model=RPEEntryResponseModel, status_code=201, dependencies=[Depends(require_role("coach"))])
 async def create_rpe_entry(
