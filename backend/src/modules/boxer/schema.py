@@ -1,11 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from uuid import UUID
-from typing import List, Optional
-
 from pydantic import BaseModel, EmailStr, model_validator
 from uuid import UUID
 from typing import List, Optional
-from src.core.config import settings
+
 
 class BoxerResponse(BaseModel):
     id: UUID
@@ -14,6 +10,11 @@ class BoxerResponse(BaseModel):
     email: EmailStr
     picture: Optional[str] = None
     coach_id: UUID
+    
+    # NEW FIELDS
+    height: Optional[int] = None
+    weight: Optional[float] = None
+    age: Optional[int] = None
 
     model_config = {
         "from_attributes": True,
@@ -23,7 +24,7 @@ class BoxerResponse(BaseModel):
     @model_validator(mode="after")
     def build_picture_url(self):
         if self.picture:
-            self.picture = f"{self.picture}" #{settings.BASE_IMG_URL}/
+            self.picture = f"{self.picture}"
         return self
     
 
@@ -42,3 +43,8 @@ class BoxerUpdate(BaseModel):
     last_name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+    
+    # NEW FIELDS
+    height: int | None = None
+    weight: float | None = None
+    age: int | None = None

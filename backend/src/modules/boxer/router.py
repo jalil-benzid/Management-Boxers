@@ -16,9 +16,15 @@ async def create_boxer(
     email: str = Form(...),
     password: str = Form(...),
     picture: Optional[UploadFile] = File(None),
+    height: Optional[int] = Form(None),
+    weight: Optional[float] = Form(None),
+    age: Optional[int] = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
-    return await BoxerController.create_boxer(first_name, last_name, email, password, current_user, picture)
+    return await BoxerController.create_boxer(
+        first_name, last_name, email, password, current_user, picture,
+        height=height, weight=weight, age=age
+    )
 
 @router.get("/", response_model=BoxerListResponseModel, dependencies=[Depends(require_role("coach"))])
 async def get_all_boxers(current_user: dict = Depends(get_current_user)):
@@ -36,9 +42,20 @@ async def update_boxer(
     email: Optional[str] = Form(None),
     password: Optional[str] = Form(None),
     picture: Optional[UploadFile] = File(None),
+    height: Optional[int] = Form(None),
+    weight: Optional[float] = Form(None),
+    age: Optional[int] = Form(None),
     current_user: dict = Depends(get_current_user)
 ):
-    payload = BoxerUpdate(first_name=first_name, last_name=last_name, email=email, password=password)
+    payload = BoxerUpdate(
+        first_name=first_name, 
+        last_name=last_name, 
+        email=email, 
+        password=password,
+        height=height,
+        weight=weight,
+        age=age
+    )
     return await BoxerController.update_boxer(boxer_id, payload, current_user, picture)
 
 @router.delete("/{boxer_id}", response_model=BoxerResponseModel, dependencies=[Depends(require_role("coach"))])

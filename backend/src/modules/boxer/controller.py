@@ -14,7 +14,17 @@ from src.modules.boxer.utils.logger import logger
 class BoxerController:
 
     @staticmethod
-    async def create_boxer(first_name: str, last_name: str, email: str, password: str, current_user: dict, picture: UploadFile | None = None) -> BoxerResponseModel:
+    async def create_boxer(
+        first_name: str, 
+        last_name: str, 
+        email: str, 
+        password: str, 
+        current_user: dict, 
+        picture: UploadFile | None = None,
+        height: int | None = None,
+        weight: float | None = None,
+        age: int | None = None
+    ) -> BoxerResponseModel:
         existing = await BoxerService.get_boxer_by_email(email)
         if existing:
             raise HTTPException(
@@ -30,7 +40,10 @@ class BoxerController:
             email=email,
             password=password,
             coach_id=coach_id,
-            picture=picture
+            picture=picture,
+            height=height,
+            weight=weight,
+            age=age
         )
 
         return BoxerResponseModel(
@@ -73,7 +86,12 @@ class BoxerController:
         )
 
     @staticmethod
-    async def update_boxer(boxer_id: UUID, payload: BoxerUpdate, current_user: dict, picture: UploadFile | None = None) -> BoxerResponseModel:
+    async def update_boxer(
+        boxer_id: UUID, 
+        payload: BoxerUpdate, 
+        current_user: dict, 
+        picture: UploadFile | None = None
+    ) -> BoxerResponseModel:
         boxer = await BoxerService.get_boxer_by_id(boxer_id)
 
         if not boxer:
@@ -94,7 +112,10 @@ class BoxerController:
             last_name=payload.last_name,
             email=payload.email,
             password=payload.password,
-            picture=picture
+            picture=picture,
+            height=payload.height,
+            weight=payload.weight,
+            age=payload.age
         )
 
         logger.info(f"[Controller] Boxer updated: {boxer_id}")
