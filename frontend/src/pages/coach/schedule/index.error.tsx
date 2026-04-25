@@ -108,64 +108,91 @@ export default function CoachSchedule() {
 
   // ---------------- FETCH CURRENT USER ----------------
   const fetchMe = async (): Promise<MeResponse | null> => {
-    const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return await res.json();
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return await res.json();
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   };
 
   // ---------------- FETCH ALL SCHEDULES ----------------
   const fetchSchedules = useCallback(async (): Promise<BackendSchedule[]> => {
     if (!coachId) return [];
     
-    const res = await fetch(`${API_BASE_URL}/api/schedules/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    
-    const data = await res.json();
-    
-    if (res.ok && data.success) {
-      setSchedules(data.data);
-      return data.data;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/schedules/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setSchedules(data.data);
+        return data.data;
+      }
+      return [];
+    } catch (err) {
+      console.error("Failed to fetch schedules:", err);
+      return [];
     }
-    return [];
   }, [coachId, token]);
 
   // ---------------- GET OR CREATE SCHEDULE FOR MONTH ----------------
   const getOrCreateScheduleForMonth = async (date: Date, currentSchedules?: BackendSchedule[]): Promise<string> => {
     const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     
+    console.log("Looking for schedule:", monthStr);
+    
+    // Use provided schedules or fetch fresh ones
     let schedulesToCheck = currentSchedules;
     if (!schedulesToCheck) {
       schedulesToCheck = await fetchSchedules();
     }
     
+    console.log("Existing schedules:", schedulesToCheck);
+    
+    // Check if schedule exists
     const existingSchedule = schedulesToCheck.find(s => s.month === monthStr);
     
     if (existingSchedule) {
+      console.log("Found existing schedule:", existingSchedule.id);
       return existingSchedule.id;
     }
     
-    const res = await fetch(`${API_BASE_URL}/api/schedules/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: `Schedule ${monthStr}`,
-        month: monthStr,
-      }),
-    });
+    console.log("Creating new schedule for:", monthStr);
     
-    const data = await res.json();
-    
-    if (res.ok && data.success) {
-      const newSchedule = data.data;
-      setSchedules(prev => [...prev, newSchedule]);
-      return newSchedule.id;
-    } else {
-      throw new Error(data.message || "Failed to create schedule");
+    // Create new schedule
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/schedules/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: `Schedule ${monthStr}`,
+          month: monthStr,
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        const newSchedule = data.data;
+        console.log("Created new schedule:", newSchedule.id);
+        // Update schedules state
+        setSchedules(prev => [...prev, newSchedule]);
+        return newSchedule.id;
+      } else {
+        throw new Error(data.message || "Failed to create schedule");
+      }
+    } catch (err) {
+      console.error("Failed to create schedule:", err);
+      throw err;
     }
   };
 
@@ -174,37 +201,52 @@ export default function CoachSchedule() {
     if (!coachId) return;
     
     setLoading(true);
-    const freshSchedules = await fetchSchedules();
-    const scheduleId = await getOrCreateScheduleForMonth(date, freshSchedules);
-    
-    const res = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    
-    const data = await res.json();
-    
-    if (res.ok && data.success) {
-      const backendSessions: BackendSession[] = data.data;
+    try {
+      // First fetch all schedules to ensure we have the latest
+      const freshSchedules = await fetchSchedules();
       
-      const transformedSessions: Session[] = backendSessions.map(bs => ({
-        id: bs.id,
-        title: bs.name,
-        startTime: bs.start_time.substring(0, 5),
-        endTime: bs.end_time.substring(0, 5),
-        date: bs.session_date,
-        scheduleId: bs.schedule_id,
-        exercises: bs.exercises?.map(e => ({
-          id: e.id,
-          name: e.name,
-          description: e.description || "",
-        })) || [],
-      }));
+      // Get or create schedule for current month
+      const scheduleId = await getOrCreateScheduleForMonth(date, freshSchedules);
       
-      setSessions(transformedSessions);
-    } else {
+      console.log("Fetching sessions for schedule:", scheduleId);
+      
+      // Fetch sessions for this schedule
+      const res = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        const backendSessions: BackendSession[] = data.data;
+        
+        // Transform backend sessions to frontend format
+        const transformedSessions: Session[] = backendSessions.map(bs => ({
+          id: bs.id,
+          title: bs.name,
+          startTime: bs.start_time.substring(0, 5), // Extract HH:MM
+          endTime: bs.end_time.substring(0, 5),
+          date: bs.session_date,
+          scheduleId: bs.schedule_id,
+          exercises: bs.exercises?.map(e => ({
+            id: e.id,
+            name: e.name,
+            description: e.description || "",
+          })) || [],
+        }));
+        
+        console.log("Transformed sessions:", transformedSessions.length);
+        setSessions(transformedSessions);
+      } else {
+        console.error("Failed to fetch sessions:", data);
+        setSessions([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch sessions:", err);
       setSessions([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [coachId, token, fetchSchedules]);
 
   // ---------------- INIT ----------------
@@ -218,6 +260,7 @@ export default function CoachSchedule() {
     init();
   }, []);
 
+  // Fetch schedules and sessions when coachId is available - only once initially
   useEffect(() => {
     if (coachId && !initialLoadDone.current) {
       initialLoadDone.current = true;
@@ -225,6 +268,7 @@ export default function CoachSchedule() {
     }
   }, [coachId, fetchSessionsForMonth, currentDate]);
 
+  // Fetch sessions when month changes
   useEffect(() => {
     if (coachId && initialLoadDone.current) {
       fetchSessionsForMonth(currentDate);
@@ -342,55 +386,75 @@ export default function CoachSchedule() {
     setIsSubmitting(true);
     setAlert(null);
     
-    const freshSchedules = await fetchSchedules();
-    const scheduleId = await getOrCreateScheduleForMonth(selectedDateForm, freshSchedules);
-    const formattedDate = selectedDateForm.toISOString().split('T')[0];
-    
-    const sessionRes = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: sessionName,
-        session_date: formattedDate,
-        start_time: startTime,
-        end_time: endTime,
-      }),
-    });
-    
-    const sessionData = await sessionRes.json();
-    
-    if (!sessionRes.ok || !sessionData.success) {
-      throw new Error(sessionData.message || "Failed to create session");
+    try {
+      // Get fresh schedules first
+      const freshSchedules = await fetchSchedules();
+      
+      // Get schedule for the selected date
+      const scheduleId = await getOrCreateScheduleForMonth(selectedDateForm, freshSchedules);
+      
+      // Format date as YYYY-MM-DD
+      const formattedDate = selectedDateForm.toISOString().split('T')[0];
+      
+      console.log("Creating session with scheduleId:", scheduleId);
+      
+      // Create session
+      const sessionRes = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: sessionName,
+          session_date: formattedDate,
+          start_time: startTime,
+          end_time: endTime,
+        }),
+      });
+      
+      const sessionData = await sessionRes.json();
+      
+      if (!sessionRes.ok || !sessionData.success) {
+        throw new Error(sessionData.message || "Failed to create session");
+      }
+      
+      const newBackendSession = sessionData.data;
+      const sessionId = newBackendSession.id;
+      
+      console.log("Session created:", sessionId);
+      
+      // Create exercises for the session
+      if (exercises.length > 0) {
+        await Promise.all(
+          exercises.map(exercise =>
+            fetch(`${API_BASE_URL}/api/sessions/${sessionId}/exercises`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name: exercise.name,
+                description: exercise.description,
+              }),
+            })
+          )
+        );
+        console.log("Exercises created");
+      }
+      
+      setAlert({ type: "success", message: "Session created successfully" });
+      
+      // Refresh sessions for the current month
+      await fetchSessionsForMonth(currentDate);
+      handleCloseSidebar();
+    } catch (err: any) {
+      console.error("Error creating session:", err);
+      setAlert({ type: "error", message: err.message || "Failed to create session" });
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    const newBackendSession = sessionData.data;
-    const sessionId = newBackendSession.id;
-    
-    if (exercises.length > 0) {
-      await Promise.all(
-        exercises.map(exercise =>
-          fetch(`${API_BASE_URL}/api/sessions/${sessionId}/exercises`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              name: exercise.name,
-              description: exercise.description,
-            }),
-          })
-        )
-      );
-    }
-    
-    setAlert({ type: "success", message: "Session created successfully" });
-    await fetchSessionsForMonth(currentDate);
-    handleCloseSidebar();
-    setIsSubmitting(false);
   };
 
   const getDaysInMonth = (date: Date): DaySession[] => {
@@ -494,6 +558,7 @@ export default function CoachSchedule() {
 
   return (
     <>
+      {/* Alert Component */}
       {alert && (
         <div className="fixed-alert">
           <Alert severity={alert.type}>{alert.message}</Alert>
@@ -501,8 +566,10 @@ export default function CoachSchedule() {
       )}
 
       <div className={`coach-home ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        {/* Overlay */}
         {isSidebarOpen && <div className="overlay" onClick={handleCloseSidebar} />}
         
+        {/* Header */}
         <div className="dashboard-header">
           <div className="header-left">
             {viewType === "monthly" ? (
@@ -557,6 +624,7 @@ export default function CoachSchedule() {
 
         <div className="header-divider" />
 
+        {/* Calendar View */}
         {viewType === "monthly" && (
           <div className="calendar-wrapper">
             <div className="calendar-grid">
@@ -606,6 +674,7 @@ export default function CoachSchedule() {
           </div>
         )}
 
+        {/* Daily View */}
         {viewType === "daily" && (
           <div className="daily-view-wrapper">
             <div className="daily-timeline">
@@ -659,6 +728,7 @@ export default function CoachSchedule() {
         )}
       </div>
 
+      {/* Sidebar */}
       <div className={`session-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <button className="close-btn" onClick={handleCloseSidebar}>
@@ -668,6 +738,7 @@ export default function CoachSchedule() {
         </div>
 
         <div className="sidebar-content">
+          {/* Session Name */}
           <div className="form-group">
             <label className="form-label">Session name</label>
             <input
@@ -679,6 +750,7 @@ export default function CoachSchedule() {
             />
           </div>
 
+          {/* Date and Time Row */}
           <div className="datetime-row">
             <div className="date-picker-wrapper">
               <button 
@@ -729,9 +801,11 @@ export default function CoachSchedule() {
             </div>
           </div>
 
+          {/* Exercises Section */}
           <div className="exercises-section">
             <h3 className="section-title">Exercises</h3>
             
+            {/* Exercise Cards */}
             {exercises.map((exercise) => (
               <div key={exercise.id} className="exercise-card">
                 <div className="exercise-card-header">
@@ -755,6 +829,7 @@ export default function CoachSchedule() {
               </div>
             ))}
 
+            {/* Add Exercise Form */}
             {isAddingExercise ? (
               <div className="add-exercise-form">
                 <input
@@ -795,6 +870,7 @@ export default function CoachSchedule() {
           </div>
         </div>
 
+        {/* Sidebar Footer */}
         <div className="sidebar-footer">
           <button className="cancel-btn" onClick={handleCloseSidebar}>
             Cancel
@@ -811,4 +887,6 @@ export default function CoachSchedule() {
     </>
   );
 }
+
+
 
