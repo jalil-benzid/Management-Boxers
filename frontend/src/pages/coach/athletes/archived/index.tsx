@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Search, Loader2, ImageIcon } from "lucide-react";
 import Alert from "@mui/material/Alert";
 import "./CoachesAdminDashboard.css";
-import { API_BASE_URL, IMAGE_URL } from "../../../api/config";
+import { API_BASE_URL, IMAGE_URL } from "../../../../api/config";
 
 interface Athlete {
   id: string;
