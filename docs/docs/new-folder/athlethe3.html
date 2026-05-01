@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zephyr</title>
+  <link rel="stylesheet" href="athletev2.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== MAIN PANEL ===== -->
+  <div class="main">
+
+    <div class="topbar">
+      <img src="logo.svg" alt="Zephyr" style="height: 40px; width: auto;" />
+      <div class="topbar-right">
+        <div class="avatar-circle"></div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+      <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
+      <span class="month-label" id="month-label">January 2026</span>
+      <div class="filter-wrap">
+        <select class="filter-select" id="filter-select" onchange="filterSessions()">
+          <option value="all">All sessions</option>
+          <option value="Session-training">Training</option>
+          <option value="Session-Boxing">Boxing</option>
+          <option value="Session-Cardio">Cardio</option>
+          <option value="Session-Sparring">Sparring</option>
+        </select>
+        <span class="filter-arrow">&#8964;</span>
+      </div>
+    </div>
+
+    <div id="schedule-container"></div>
+
+  </div>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Session1</span>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-section-label">leave a review:</div>
+
+      <div class="modal-field-label">Difficulty :</div>
+      <div class="diff-buttons" id="diff-buttons">
+        <button class="diff-btn active" onclick="selectDiff(this, 'very-hard')">very-hard</button>
+        <button class="diff-btn" onclick="selectDiff(this, 'hard')">hard</button>
+        <button class="diff-btn" onclick="selectDiff(this, 'medium')">medium</button>
+        <button class="diff-btn" onclick="selectDiff(this, 'very-easy')">very-easy</button>
+        <button class="diff-btn" onclick="selectDiff(this, 'easy')">easy</button>
+      </div>
+
+      <div class="modal-field-label">Comment :</div>
+      <textarea class="modal-comment" id="modal-comment" placeholder="Share your thoughts"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+      <button class="post-btn-modal" onclick="postReview()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="athletev2.js"></script>
+</body>
+</html> 
