@@ -5,7 +5,6 @@ import { API_BASE_URL } from "../../../api/config";
 import "./CoachDashboard.scss";
 import { useNavigate } from "react-router-dom";
 
-// Types matching your backend schemas
 interface DashboardStats {
   total_boxers: number;
   sessions_this_week: number;
@@ -49,26 +48,22 @@ export default function CoachHome() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Format time from "10:00:00" to "10:00"
   const formatTime = (timeStr: string) => {
     return timeStr.slice(0, 5);
   };
 
-  // Format remaining time as HH:MM:SS
   const formatRemainingTime = (minutes: number) => {
     const hrs = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:00`;
   };
 
-  // Calculate circular progress for attendance ring
   const getAttendanceProgress = (present: number, absent: number) => {
     const total = present + absent;
     if (total === 0) return 0;
     return (present / total) * 100;
   };
 
-  // Fetch all dashboard data
   const fetchDashboardData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -94,18 +89,17 @@ export default function CoachHome() {
       if (sessionsData.success) setTodaySessions(sessionsData.data);
       if (ongoingData.success) setOngoingSession(ongoingData.data);
     } catch (err) {
-      setError("Failed to load dashboard data");
+      setError(t("coachDashboard.error"));
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, [token, t]);
 
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // Get status badge class
   const getStatusClass = (status: string) => {
     switch (status) {
       case "completed":
@@ -119,15 +113,14 @@ export default function CoachHome() {
     }
   };
 
-  // Get status label
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "completed":
-        return "Completed";
+        return t("coachDashboard.status_completed");
       case "ongoing":
-        return "On going";
+        return t("coachDashboard.status_ongoing");
       case "upcoming":
-        return "Upcoming";
+        return t("coachDashboard.status_upcoming");
       default:
         return status;
     }
@@ -136,7 +129,7 @@ export default function CoachHome() {
   if (isLoading) {
     return (
       <div className="dashboard-page animate-fadeIn">
-        <div className="loading-state">Loading dashboard...</div>
+        <div className="loading-state">{t("coachDashboard.loading")}</div>
       </div>
     );
   }
@@ -157,75 +150,71 @@ export default function CoachHome() {
 
   return (
     <div className="dashboard-page animate-fadeIn">
-      {/* Header */}
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-      <button 
-        className="add-athletes-btn"
-        onClick={() => navigate("/coach/dashboard/athletes")}
-      >
-        <span>+</span> Add athletes
-      </button>
+        <h1>{t("coachDashboard.dashboard")}</h1>
+        <button
+          className="add-athletes-btn"
+          onClick={() => navigate("/coach/dashboard/athletes")}
+        >
+          <span>+</span> {t("coachDashboard.add_athletes")}
+        </button>
       </div>
 
-      {/* Stats Cards */}
       <div className="stats-grid">
         <div className="stat-card animate-slideUp">
           <div className="stat-header">
-            <span className="stat-label">Total athletes</span>
+            <span className="stat-label">{t("coachDashboard.total_athletes")}</span>
             <div className="stat-icon athletes-icon">
               <Users size={18} />
             </div>
           </div>
           <div className="stat-value">{stats?.total_boxers ?? 0}</div>
-          <div className="stat-subtitle">Registered & active</div>
+          <div className="stat-subtitle">{t("coachDashboard.registered_active")}</div>
         </div>
 
         <div className="stat-card animate-slideUp" style={{ animationDelay: "0.1s" }}>
           <div className="stat-header">
-            <span className="stat-label">Sessions this week</span>
+            <span className="stat-label">{t("coachDashboard.sessions_this_week")}</span>
             <div className="stat-icon sessions-icon">
               <Calendar size={18} />
             </div>
           </div>
           <div className="stat-value">{stats?.sessions_this_week ?? 0}</div>
-          <div className="stat-subtitle">to do this week</div>
+          <div className="stat-subtitle">{t("coachDashboard.to_do_this_week")}</div>
         </div>
 
         <div className="stat-card animate-slideUp" style={{ animationDelay: "0.2s" }}>
           <div className="stat-header">
-            <span className="stat-label">Attendance rate</span>
+            <span className="stat-label">{t("coachDashboard.attendance_rate")}</span>
             <div className="stat-icon rate-icon">
               <TrendingUp size={18} />
             </div>
           </div>
           <div className="stat-value">{stats?.attendance_rate ?? 0}%</div>
-          <div className="stat-subtitle positive">+3% vs last month</div>
+          <div className="stat-subtitle positive">{t("coachDashboard.vs_last_month")}</div>
         </div>
 
         <div className="stat-card animate-slideUp" style={{ animationDelay: "0.3s" }}>
           <div className="stat-header">
-            <span className="stat-label">Avg Attendance</span>
+            <span className="stat-label">{t("coachDashboard.avg_attendance")}</span>
             <div className="stat-icon avg-icon">
               <UserCheck size={18} />
             </div>
           </div>
           <div className="stat-value">{stats?.avg_attendance ?? 0}</div>
-          <div className="stat-subtitle">Athletes / session</div>
+          <div className="stat-subtitle">{t("coachDashboard.athletes_per_session")}</div>
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="dashboard-content">
-        {/* Today's Sessions */}
         <div className="sessions-card animate-slideUp" style={{ animationDelay: "0.4s" }}>
           <div className="card-header">
             <div className="header-left">
-              <h2>Today's sessions</h2>
+              <h2>{t("coachDashboard.todays_sessions")}</h2>
               <span className="date-badge">{today}</span>
             </div>
             <button className="schedule-link">
-              Go to Schedule <ArrowRight size={16} />
+              {t("coachDashboard.go_to_schedule")} <ArrowRight size={16} />
             </button>
           </div>
 
@@ -245,18 +234,17 @@ export default function CoachHome() {
             ))}
 
             {todaySessions.length === 0 && (
-              <div className="empty-state">No sessions scheduled for today</div>
+              <div className="empty-state">{t("coachDashboard.no_sessions_today")}</div>
             )}
           </div>
         </div>
 
-        {/* Ongoing Session */}
         <div className="ongoing-card animate-slideUp" style={{ animationDelay: "0.5s" }}>
           {ongoingSession ? (
             <>
               <div className="card-header">
-                <h2>Ongoing Session</h2>
-                <span className="ongoing-badge">On going</span>
+                <h2>{t("coachDashboard.ongoing_session")}</h2>
+                <span className="ongoing-badge">{t("coachDashboard.status_ongoing")}</span>
               </div>
 
               <div className="ongoing-details">
@@ -268,11 +256,10 @@ export default function CoachHome() {
                 </div>
                 <div className="exercises-badge">
                   <Dumbbell size={14} />
-                  {ongoingSession.exercises_count} Exercises
+                  {ongoingSession.exercises_count} {t("coachDashboard.exercises")}
                 </div>
               </div>
 
-              {/* Circular Timer */}
               <div className="timer-container">
                 <div className="circular-progress">
                   <svg viewBox="0 0 120 120" className="progress-ring">
@@ -298,37 +285,34 @@ export default function CoachHome() {
                     <div className="timer-value">
                       {formatRemainingTime(ongoingSession.remaining_minutes)}
                     </div>
-                    <div className="timer-label">left</div>
+                    <div className="timer-label">{t("coachDashboard.left")}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Attendance Stats */}
               <div className="attendance-stats">
                 <div className="attendance-item present">
                   <span className="attendance-number">{ongoingSession.present}</span>
-                  <span className="attendance-label">present</span>
+                  <span className="attendance-label">{t("coachDashboard.present")}</span>
                 </div>
                 <div className="attendance-item absent">
                   <span className="attendance-number">{ongoingSession.absent}</span>
-                  <span className="attendance-label">Absente</span>
+                  <span className="attendance-label">{t("coachDashboard.absent")}</span>
                 </div>
               </div>
             </>
           ) : (
             <div className="no-ongoing">
               <div className="card-header">
-                <h2>Ongoing Session</h2>
+                <h2>{t("coachDashboard.ongoing_session")}</h2>
               </div>
-              <div className="empty-state">No ongoing session</div>
+              <div className="empty-state">{t("coachDashboard.no_ongoing_session")}</div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Section Placeholder */}
       <div className="bottom-section animate-slideUp" style={{ animationDelay: "0.6s" }}>
-        {/* Add charts or additional analytics here */}
       </div>
     </div>
   );

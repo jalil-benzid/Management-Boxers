@@ -1,4 +1,3 @@
-// CoachSchedule.tsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Plus, X, Calendar, Clock } from "lucide-react";
@@ -6,7 +5,6 @@ import Alert from "@mui/material/Alert";
 import { API_BASE_URL } from "../../../api/config";
 import "./CoachSchedule.scss";
 
-// Types matching backend response
 interface BackendSession {
   id: string;
   name: string;
@@ -31,7 +29,6 @@ interface BackendSchedule {
   coach_id: string;
 }
 
-// Frontend types
 interface Session {
   id: string;
   title: string;
@@ -73,16 +70,13 @@ export default function CoachSchedule() {
   const [schedules, setSchedules] = useState<BackendSchedule[]>([]);
   const [coachId, setCoachId] = useState<string | null>(null);
   
-  // Use a ref to track if initial load is done
   const initialLoadDone = useRef(false);
   
-  // Alert state
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "info" | "warning";
     message: string;
   } | null>(null);
   
-  // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sessionName, setSessionName] = useState("");
   const [selectedDateForm, setSelectedDateForm] = useState<Date>(new Date());
@@ -91,7 +85,6 @@ export default function CoachSchedule() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Exercises state
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [currentExercise, setCurrentExercise] = useState({ name: "", description: "" });
@@ -99,14 +92,12 @@ export default function CoachSchedule() {
 
   const token = localStorage.getItem("token");
 
-  // Auto-dismiss alert after 4 seconds
   useEffect(() => {
     if (!alert) return;
     const timer = setTimeout(() => setAlert(null), 4000);
     return () => clearTimeout(timer);
   }, [alert]);
 
-  // ---------------- FETCH CURRENT USER ----------------
   const fetchMe = async (): Promise<MeResponse | null> => {
     const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -114,7 +105,6 @@ export default function CoachSchedule() {
     return await res.json();
   };
 
-  // ---------------- FETCH ALL SCHEDULES ----------------
   const fetchSchedules = useCallback(async (): Promise<BackendSchedule[]> => {
     if (!coachId) return [];
     
@@ -131,7 +121,6 @@ export default function CoachSchedule() {
     return [];
   }, [coachId, token]);
 
-  // ---------------- GET OR CREATE SCHEDULE FOR MONTH ----------------
   const getOrCreateScheduleForMonth = async (date: Date, currentSchedules?: BackendSchedule[]): Promise<string> => {
     const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     
@@ -169,7 +158,6 @@ export default function CoachSchedule() {
     }
   };
 
-  // ---------------- FETCH SESSIONS FOR CURRENT MONTH ----------------
   const fetchSessionsForMonth = useCallback(async (date: Date) => {
     if (!coachId) return;
     
@@ -207,7 +195,6 @@ export default function CoachSchedule() {
     setLoading(false);
   }, [coachId, token, fetchSchedules]);
 
-  // ---------------- INIT ----------------
   useEffect(() => {
     const init = async () => {
       const me = await fetchMe();
@@ -342,55 +329,60 @@ export default function CoachSchedule() {
     setIsSubmitting(true);
     setAlert(null);
     
-    const freshSchedules = await fetchSchedules();
-    const scheduleId = await getOrCreateScheduleForMonth(selectedDateForm, freshSchedules);
-    const formattedDate = selectedDateForm.toISOString().split('T')[0];
-    
-    const sessionRes = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name: sessionName,
-        session_date: formattedDate,
-        start_time: startTime,
-        end_time: endTime,
-      }),
-    });
-    
-    const sessionData = await sessionRes.json();
-    
-    if (!sessionRes.ok || !sessionData.success) {
-      throw new Error(sessionData.message || "Failed to create session");
+    try {
+      const freshSchedules = await fetchSchedules();
+      const scheduleId = await getOrCreateScheduleForMonth(selectedDateForm, freshSchedules);
+      const formattedDate = selectedDateForm.toISOString().split('T')[0];
+      
+      const sessionRes = await fetch(`${API_BASE_URL}/api/schedules/${scheduleId}/sessions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: sessionName,
+          session_date: formattedDate,
+          start_time: startTime,
+          end_time: endTime,
+        }),
+      });
+      
+      const sessionData = await sessionRes.json();
+      
+      if (!sessionRes.ok || !sessionData.success) {
+        throw new Error(sessionData.message || "Failed to create session");
+      }
+      
+      const newBackendSession = sessionData.data;
+      const sessionId = newBackendSession.id;
+      
+      if (exercises.length > 0) {
+        await Promise.all(
+          exercises.map(exercise =>
+            fetch(`${API_BASE_URL}/api/sessions/${sessionId}/exercises`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                name: exercise.name,
+                description: exercise.description,
+              }),
+            })
+          )
+        );
+      }
+      
+      setAlert({ type: "success", message: t("schedule.session_created") });
+      await fetchSessionsForMonth(currentDate);
+      handleCloseSidebar();
+    } catch (err) {
+      setAlert({ type: "error", message: err instanceof Error ? err.message : "Unknown error" });
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    const newBackendSession = sessionData.data;
-    const sessionId = newBackendSession.id;
-    
-    if (exercises.length > 0) {
-      await Promise.all(
-        exercises.map(exercise =>
-          fetch(`${API_BASE_URL}/api/sessions/${sessionId}/exercises`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              name: exercise.name,
-              description: exercise.description,
-            }),
-          })
-        )
-      );
-    }
-    
-    setAlert({ type: "success", message: "Session created successfully" });
-    await fetchSessionsForMonth(currentDate);
-    handleCloseSidebar();
-    setIsSubmitting(false);
   };
 
   const getDaysInMonth = (date: Date): DaySession[] => {
@@ -425,11 +417,8 @@ export default function CoachSchedule() {
     return days;
   };
 
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+  const weekDays = t("schedule.week_days", { returnObjects: true }) as string[];
+  const monthNames = t("schedule.months", { returnObjects: true }) as string[];
 
   const days = getDaysInMonth(currentDate);
 
@@ -485,7 +474,7 @@ export default function CoachSchedule() {
   if (loading) {
     return (
       <div className="coach-home loading">
-        <div className="loading-spinner">Loading calendar...</div>
+        <div className="loading-spinner">{t("schedule.loading")}</div>
       </div>
     );
   }
@@ -535,7 +524,7 @@ export default function CoachSchedule() {
           <div className="header-right">
             <button className="add-session-btn" onClick={handleAddSession}>
               <Plus size={18} />
-              <span>Add Session</span>
+              <span>{t("schedule.add_session")}</span>
             </button>
             
             <div className="toggle-switch">
@@ -543,13 +532,13 @@ export default function CoachSchedule() {
                 className={`toggle-btn ${viewType === "monthly" ? "active" : ""}`}
                 onClick={() => setViewType("monthly")}
               >
-                Monthly
+                {t("schedule.monthly")}
               </button>
               <button
                 className={`toggle-btn ${viewType === "daily" ? "active" : ""}`}
                 onClick={() => setViewType("daily")}
               >
-                Daily
+                {t("schedule.daily")}
               </button>
             </div>
           </div>
@@ -594,7 +583,9 @@ export default function CoachSchedule() {
                             className="more-sessions-btn"
                             onClick={(e) => handleMoreSessionsClick(day.date, e)}
                           >
-                            +{day.sessions.length - 2} more session{day.sessions.length - 2 > 1 ? 's' : ''}
+                            {day.sessions.length - 2 === 1
+                              ? t("schedule.more_sessions", { count: day.sessions.length - 2 })
+                              : t("schedule.more_sessions_plural", { count: day.sessions.length - 2 })}
                           </button>
                         )}
                       </div>
@@ -650,7 +641,7 @@ export default function CoachSchedule() {
 
                 {selectedDateSessions.length === 0 && (
                   <div className="no-sessions-message">
-                    No sessions scheduled for this day
+                    {t("schedule.no_sessions")}
                   </div>
                 )}
               </div>
@@ -664,16 +655,16 @@ export default function CoachSchedule() {
           <button className="close-btn" onClick={handleCloseSidebar}>
             <X size={20} />
           </button>
-          <h2 className="sidebar-title">New Session</h2>
+          <h2 className="sidebar-title">{t("schedule.new_session")}</h2>
         </div>
 
         <div className="sidebar-content">
           <div className="form-group">
-            <label className="form-label">Session name</label>
+            <label className="form-label">{t("schedule.session_name")}</label>
             <input
               type="text"
               className="form-input"
-              placeholder="Enter session name"
+              placeholder={t("schedule.enter_session_name")}
               value={sessionName}
               onChange={(e) => setSessionName(e.target.value)}
             />
@@ -730,7 +721,7 @@ export default function CoachSchedule() {
           </div>
 
           <div className="exercises-section">
-            <h3 className="section-title">Exercises</h3>
+            <h3 className="section-title">{t("schedule.exercises")}</h3>
             
             {exercises.map((exercise) => (
               <div key={exercise.id} className="exercise-card">
@@ -741,13 +732,13 @@ export default function CoachSchedule() {
                       className="edit-btn"
                       onClick={() => handleEditExercise(exercise)}
                     >
-                      Edit
+                      {t("schedule.edit")}
                     </button>
                     <button 
                       className="delete-btn"
                       onClick={() => handleDeleteExercise(exercise.id)}
                     >
-                      Delete
+                      {t("schedule.delete")}
                     </button>
                   </div>
                 </div>
@@ -760,26 +751,26 @@ export default function CoachSchedule() {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Exercise name"
+                  placeholder={t("schedule.exercise_name")}
                   value={currentExercise.name}
                   onChange={(e) => setCurrentExercise({ ...currentExercise, name: e.target.value })}
                 />
                 <textarea
                   className="form-textarea"
-                  placeholder="Exercise description"
+                  placeholder={t("schedule.exercise_description")}
                   value={currentExercise.description}
                   onChange={(e) => setCurrentExercise({ ...currentExercise, description: e.target.value })}
                   rows={3}
                 />
                 <div className="exercise-form-actions">
                   <button className="cancel-exercise-btn" onClick={handleCancelExercise}>
-                    Cancel
+                    {t("schedule.cancel")}
                   </button>
                   <button 
                     className="add-exercise-btn"
                     onClick={editingExerciseId ? handleUpdateExercise : handleAddExercise}
                   >
-                    {editingExerciseId ? 'Update' : 'Add'}
+                    {editingExerciseId ? t("schedule.update_exercise") : t("schedule.add_exercise_btn")}
                   </button>
                 </div>
               </div>
@@ -789,7 +780,7 @@ export default function CoachSchedule() {
                 onClick={() => setIsAddingExercise(true)}
               >
                 <Plus size={18} />
-                <span>Add Exercise</span>
+                <span>{t("schedule.add_exercise")}</span>
               </button>
             )}
           </div>
@@ -797,14 +788,14 @@ export default function CoachSchedule() {
 
         <div className="sidebar-footer">
           <button className="cancel-btn" onClick={handleCloseSidebar}>
-            Cancel
+            {t("schedule.cancel")}
           </button>
           <button 
             className="create-btn"
             onClick={handleCreateSession}
             disabled={!sessionName.trim() || isSubmitting}
           >
-            {isSubmitting ? 'Creating...' : 'Create Session'}
+            {isSubmitting ? t("schedule.creating") : t("schedule.create_session")}
           </button>
         </div>
       </div>

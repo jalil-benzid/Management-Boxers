@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import Alert from "@mui/material/Alert";
 import { Pencil, Save, X } from "lucide-react";
 import { API_BASE_URL } from "../../../api/config";
@@ -26,6 +27,8 @@ interface UpdateResponse {
 }
 
 export default function CoachProfile() {
+  const { t } = useTranslation();
+
   const [coach, setCoach] = useState<Coach | null>(null);
 
   const [fullName, setFullName] = useState("");
@@ -46,14 +49,12 @@ export default function CoachProfile() {
 
   const token = localStorage.getItem("token");
 
-  // Auto-dismiss alert after 4 seconds
   useEffect(() => {
     if (!alert) return;
     const timer = setTimeout(() => setAlert(null), 4000);
     return () => clearTimeout(timer);
   }, [alert]);
 
-  // Track changes
   useEffect(() => {
     if (coach) {
       const nameChanged = fullName !== coach.full_name;
@@ -63,7 +64,6 @@ export default function CoachProfile() {
     }
   }, [fullName, email, password, coach]);
 
-  // ---------------- FETCH CURRENT USER ----------------
   const fetchMe = async (): Promise<MeResponse | null> => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
@@ -76,7 +76,6 @@ export default function CoachProfile() {
     }
   };
 
-  // ---------------- FETCH COACH ----------------
   const fetchCoach = useCallback(async (id: string) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/coaches/${id}`, {
@@ -91,14 +90,13 @@ export default function CoachProfile() {
         setFullName(c.full_name);
         setEmail(c.email);
       } else {
-        setAlert({ type: "error", message: data.detail || "Error loading coach" });
+        setAlert({ type: "error", message: data.detail || t("coachProfile.error_loading") });
       }
     } catch (err) {
-      setAlert({ type: "error", message: "Network error" });
+      setAlert({ type: "error", message: t("coachProfile.network_error") });
     }
-  }, []);
+  }, [t]);
 
-  // ---------------- INIT ----------------
   useEffect(() => {
     const init = async () => {
       const me = await fetchMe();
@@ -109,7 +107,6 @@ export default function CoachProfile() {
     init();
   }, [fetchCoach]);
 
-  // ---------------- HANDLERS ----------------
   const handleNameEdit = () => setIsEditingName(true);
   const handleNameSave = () => setIsEditingName(false);
   const handleNameCancel = () => {
@@ -151,7 +148,6 @@ export default function CoachProfile() {
     }
   };
 
-  // ---------------- SAVE ----------------
   const handleSave = async () => {
     if (!coach || !hasChanges) return;
 
@@ -177,7 +173,7 @@ export default function CoachProfile() {
       const data: UpdateResponse = await res.json();
 
       if (!res.ok) {
-        setAlert({ type: "error", message: data.message || "Update failed" });
+        setAlert({ type: "error", message: data.message || t("coachProfile.update_failed") });
         return;
       }
 
@@ -187,14 +183,14 @@ export default function CoachProfile() {
       setPassword("");
       setTempPassword("");
 
-      setAlert({ type: "success", message: "Profile updated successfully" });
+      setAlert({ type: "success", message: t("coachProfile.profile_updated") });
 
       setIsEditingName(false);
       setIsEditingEmail(false);
       setIsEditingPassword(false);
       setHasChanges(false);
     } catch (err) {
-      setAlert({ type: "error", message: "Network error" });
+      setAlert({ type: "error", message: t("coachProfile.network_error") });
     } finally {
       setIsSaving(false);
     }
@@ -212,7 +208,6 @@ export default function CoachProfile() {
 
   return (
     <div className="coach-profile">
-      {/* Alert Component */}
       {alert && (
         <div className="fixed-alert">
           <Alert severity={alert.type}>{alert.message}</Alert>
@@ -220,21 +215,18 @@ export default function CoachProfile() {
       )}
 
       <div className="profile-card">
-        {/* Avatar */}
         <div className="profile-avatar">
           <div className="avatar-letter">{getInitial()}</div>
         </div>
 
-        {/* Account Info */}
         <div className="profile-section">
           <div className="section-header">
-            <h3>Account Information</h3>
+            <h3>{t("coachProfile.account_info")}</h3>
             <div className="section-line"></div>
           </div>
 
-          {/* Full Name Field */}
           <div className="profile-field">
-            <label>Full Name</label>
+            <label>{t("coachProfile.full_name")}</label>
             <div className="field-with-icon">
               {isEditingName ? (
                 <>
@@ -262,9 +254,8 @@ export default function CoachProfile() {
             </div>
           </div>
 
-          {/* Email Field */}
           <div className="profile-field">
-            <label>Email</label>
+            <label>{t("coachProfile.email")}</label>
             <div className="field-with-icon">
               {isEditingEmail ? (
                 <>
@@ -293,15 +284,14 @@ export default function CoachProfile() {
           </div>
         </div>
 
-        {/* Security */}
         <div className="profile-section">
           <div className="section-header">
-            <h3>Security</h3>
+            <h3>{t("coachProfile.security")}</h3>
             <div className="section-line"></div>
           </div>
 
           <div className="profile-field">
-            <label>Password</label>
+            <label>{t("coachProfile.password")}</label>
             <div className="field-with-icon">
               {isEditingPassword ? (
                 <>
@@ -309,7 +299,7 @@ export default function CoachProfile() {
                     type="password"
                     value={tempPassword}
                     onChange={(e) => setTempPassword(e.target.value)}
-                    placeholder="Enter new password"
+                    placeholder={t("coachProfile.enter_new_password")}
                     autoFocus
                   />
                   <button className="icon-button save-icon" onClick={handlePasswordSave}>
@@ -323,7 +313,7 @@ export default function CoachProfile() {
                 <>
                   <input
                     type="password"
-                    value={password || "************"}
+                    value={password || t("coachProfile.password_placeholder")}
                     disabled
                   />
                   <button className="icon-button edit-icon" onClick={handlePasswordEdit}>
@@ -335,14 +325,13 @@ export default function CoachProfile() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="profile-actions">
           <button
             className={`btn-cancel ${!hasChanges ? "disabled" : ""}`}
             onClick={handleCancel}
             disabled={!hasChanges || isSaving}
           >
-            Cancel
+            {t("coachProfile.cancel")}
           </button>
 
           <button
@@ -350,11 +339,12 @@ export default function CoachProfile() {
             onClick={handleSave}
             disabled={!hasChanges || isSaving}
           >
-            {isSaving ? "Saving..." : "Save Changes"}
+            {isSaving ? t("coachProfile.saving") : t("coachProfile.save_changes")}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
 

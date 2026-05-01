@@ -55,7 +55,6 @@ export default function RPEDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState<{type: "success" | "error"; message: string} | null>(null);
 
-  // Form state
   const [showForm, setShowForm] = useState(false);
   const [sessionRPE, setSessionRPE] = useState<number>(5);
   const [fatigue, setFatigue] = useState<number | "">("");
@@ -65,7 +64,6 @@ export default function RPEDashboard() {
   const [notes, setNotes] = useState("");
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // Auto-dismiss alert
   useEffect(() => {
     if (!alert) return;
     const timer = setTimeout(() => setAlert(null), 4000);
@@ -158,17 +156,17 @@ export default function RPEDashboard() {
       const data = await res.json();
 
       if (!res.ok) {
-        setAlert({ type: "error", message: data.detail || "Failed to create entry" });
+        setAlert({ type: "error", message: data.detail || t("rpeDashboard.create_failed") });
         return;
       }
 
-      setAlert({ type: "success", message: "RPE entry added!" });
+      setAlert({ type: "success", message: t("rpeDashboard.entry_added") });
       setShowForm(false);
       resetForm();
       fetchEntries(selectedBoxer);
       fetchStats(selectedBoxer);
     } catch (err) {
-      setAlert({ type: "error", message: "Network error" });
+      setAlert({ type: "error", message: t("rpeDashboard.network_error") });
     } finally {
       setIsSubmitting(false);
     }
@@ -190,6 +188,12 @@ export default function RPEDashboard() {
     return <Minus size={16} className="text-yellow" />;
   };
 
+  const getTrendLabel = (trend: string) => {
+    if (trend === "improving") return t("rpeDashboard.trend_improving");
+    if (trend === "declining") return t("rpeDashboard.trend_declining");
+    return t("rpeDashboard.trend_stable");
+  };
+
   const getRPEColor = (value: number) => {
     if (value <= 3) return "#22c55e";
     if (value <= 6) return "#eab308";
@@ -204,24 +208,22 @@ export default function RPEDashboard() {
         </div>
       )}
 
-      {/* Header */}
       <div className="rpe-dashboard-header">
         <h1>
           <Activity size={20} />
-          RPE Monitoring
+          {t("rpeDashboard.title")}
         </h1>
-        <span className="header-subtitle">Track fatigue, recovery & injury risk</span>
+        <span className="header-subtitle">{t("rpeDashboard.subtitle")}</span>
       </div>
 
-      {/* Boxer Selector */}
       <div className="boxer-selector-container animate-slideUp">
-        <label className="selector-label">Select Boxer</label>
+        <label className="selector-label">{t("rpeDashboard.select_boxer")}</label>
         <select 
           value={selectedBoxer || ""} 
           onChange={(e) => setSelectedBoxer(e.target.value || null)}
           className="boxer-select"
         >
-          <option value="">Choose a boxer...</option>
+          <option value="">{t("rpeDashboard.choose_boxer")}</option>
           {boxers.map(b => (
             <option key={b.id} value={b.id}>
               {b.firstName} {b.lastName}
@@ -232,16 +234,14 @@ export default function RPEDashboard() {
 
       {selectedBoxer && (
         <>
-          {/* Stats Cards */}
           {stats && (
             <div className="rpe-stats-grid">
-              {/* Main RPE Card - Spans 2 cols */}
               <div className="stat-card rpe-main-card animate-slideUp">
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Avg Session RPE</span>
+                  <span className="stat-card-label">{t("rpeDashboard.avg_session_rpe")}</span>
                   <span className="trend-badge">
                     {getTrendIcon(stats.trend)}
-                    <span>{stats.trend}</span>
+                    <span>{getTrendLabel(stats.trend)}</span>
                   </span>
                 </div>
                 <div 
@@ -250,81 +250,79 @@ export default function RPEDashboard() {
                 >
                   {stats.avg_session_rpe}
                 </div>
-                <div className="stat-card-subtitle">Total entries: {stats.total_entries}</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.total_entries")}: {stats.total_entries}</div>
               </div>
 
               <div className="stat-card animate-slideUp" style={{ animationDelay: "0.1s" }}>
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Fatigue</span>
+                  <span className="stat-card-label">{t("rpeDashboard.fatigue")}</span>
                   <div className="stat-card-icon">
                     <Battery size={16} />
                   </div>
                 </div>
                 <div className="stat-card-value">{stats.avg_fatigue ?? "-"}</div>
-                <div className="stat-card-subtitle">Avg level</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.avg_level")}</div>
               </div>
 
               <div className="stat-card animate-slideUp" style={{ animationDelay: "0.15s" }}>
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Sleep Quality</span>
+                  <span className="stat-card-label">{t("rpeDashboard.sleep_quality")}</span>
                   <div className="stat-card-icon">
                     <Moon size={16} />
                   </div>
                 </div>
                 <div className="stat-card-value">{stats.avg_sleep ?? "-"}</div>
-                <div className="stat-card-subtitle">Avg rating</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.avg_rating")}</div>
               </div>
 
               <div className="stat-card animate-slideUp" style={{ animationDelay: "0.2s" }}>
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Soreness</span>
+                  <span className="stat-card-label">{t("rpeDashboard.soreness")}</span>
                   <div className="stat-card-icon">
                     <Zap size={16} />
                   </div>
                 </div>
                 <div className="stat-card-value">{stats.avg_soreness ?? "-"}</div>
-                <div className="stat-card-subtitle">Avg level</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.avg_level")}</div>
               </div>
 
               <div className="stat-card animate-slideUp" style={{ animationDelay: "0.25s" }}>
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Stress</span>
+                  <span className="stat-card-label">{t("rpeDashboard.stress")}</span>
                   <div className="stat-card-icon">
                     <Brain size={16} />
                   </div>
                 </div>
                 <div className="stat-card-value">{stats.avg_stress ?? "-"}</div>
-                <div className="stat-card-subtitle">Avg level</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.avg_level")}</div>
               </div>
 
               <div className="stat-card animate-slideUp" style={{ animationDelay: "0.3s" }}>
                 <div className="stat-card-header">
-                  <span className="stat-card-label">Total Entries</span>
+                  <span className="stat-card-label">{t("rpeDashboard.total_entries_label")}</span>
                   <div className="stat-card-icon">
                     <BarChart3 size={16} />
                   </div>
                 </div>
                 <div className="stat-card-value">{stats.total_entries}</div>
-                <div className="stat-card-subtitle">Recorded sessions</div>
+                <div className="stat-card-subtitle">{t("rpeDashboard.recorded_sessions")}</div>
               </div>
             </div>
           )}
 
-          {/* Add Entry Button */}
           <button 
             className="add-entry-btn animate-slideUp"
             onClick={() => setShowForm(!showForm)}
           >
             <Plus size={18} />
-            {showForm ? "Cancel" : "Add RPE Entry"}
+            {showForm ? t("rpeDashboard.cancel") : t("rpeDashboard.add_rpe_entry")}
           </button>
 
-          {/* Entry Form */}
           {showForm && (
             <form className="rpe-form-container animate-slideUp" onSubmit={handleSubmit}>
               <div className="form-top-row">
                 <div className="form-group slider-group">
-                  <label>Session RPE *</label>
+                  <label>{t("rpeDashboard.session_rpe")}</label>
                   <div className="slider-wrapper">
                     <input 
                       type="range" 
@@ -344,7 +342,7 @@ export default function RPEDashboard() {
                 </div>
 
                 <div className="form-group date-group">
-                  <label>Date *</label>
+                  <label>{t("rpeDashboard.date")}</label>
                   <input 
                     type="date" 
                     value={entryDate}
@@ -357,7 +355,7 @@ export default function RPEDashboard() {
 
               <div className="form-metrics-row">
                 <div className="form-group">
-                  <label>Fatigue (1-10)</label>
+                  <label>{t("rpeDashboard.fatigue_label")}</label>
                   <input 
                     type="number" 
                     min="1" 
@@ -370,7 +368,7 @@ export default function RPEDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label>Sleep Quality (1-10)</label>
+                  <label>{t("rpeDashboard.sleep_quality_label")}</label>
                   <input 
                     type="number" 
                     min="1" 
@@ -383,7 +381,7 @@ export default function RPEDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label>Soreness (1-10)</label>
+                  <label>{t("rpeDashboard.soreness_label")}</label>
                   <input 
                     type="number" 
                     min="1" 
@@ -396,7 +394,7 @@ export default function RPEDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label>Stress (1-10)</label>
+                  <label>{t("rpeDashboard.stress_label")}</label>
                   <input 
                     type="number" 
                     min="1" 
@@ -410,12 +408,12 @@ export default function RPEDashboard() {
               </div>
 
               <div className="form-group notes-group">
-                <label>Notes</label>
+                <label>{t("rpeDashboard.notes")}</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
-                  placeholder="How did the session feel? Any pain or concerns?"
+                  placeholder={t("rpeDashboard.notes_placeholder")}
                   className="notes-input"
                 />
               </div>
@@ -428,24 +426,23 @@ export default function RPEDashboard() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="spinner-icon" size={16} />
-                    Saving...
+                    {t("rpeDashboard.saving")}
                   </>
                 ) : (
                   <>
                     <Plus size={16} />
-                    Save Entry
+                    {t("rpeDashboard.save_entry")}
                   </>
                 )}
               </button>
             </form>
           )}
 
-          {/* History Table */}
           <div className="history-section animate-slideUp" style={{ animationDelay: "0.35s" }}>
             <div className="history-header">
               <h3>
                 <BarChart3 size={18} />
-                RPE History
+                {t("rpeDashboard.rpe_history")}
               </h3>
             </div>
             
@@ -454,19 +451,19 @@ export default function RPEDashboard() {
                 <Loader2 className="spinner-loading" size={24} />
               </div>
             ) : entries.length === 0 ? (
-              <div className="empty-table-state">No RPE entries recorded yet</div>
+              <div className="empty-table-state">{t("rpeDashboard.no_entries")}</div>
             ) : (
               <div className="table-wrapper">
                 <table className="rpe-table">
                   <thead>
                     <tr>
-                      <th>Date</th>
-                      <th>RPE</th>
-                      <th>Fatigue</th>
-                      <th>Sleep</th>
-                      <th>Soreness</th>
-                      <th>Stress</th>
-                      <th>Notes</th>
+                      <th>{t("rpeDashboard.table_date")}</th>
+                      <th>{t("rpeDashboard.table_rpe")}</th>
+                      <th>{t("rpeDashboard.table_fatigue")}</th>
+                      <th>{t("rpeDashboard.table_sleep")}</th>
+                      <th>{t("rpeDashboard.table_soreness")}</th>
+                      <th>{t("rpeDashboard.table_stress")}</th>
+                      <th>{t("rpeDashboard.table_notes")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -503,4 +500,5 @@ export default function RPEDashboard() {
     </div>
   );
 }
+
 

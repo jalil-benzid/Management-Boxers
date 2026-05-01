@@ -44,7 +44,6 @@ export default function CoachAthletes() {
   const [deleteModal, setDeleteModal] = useState<Athlete | null>(null);
   const [deleteInput, setDeleteInput] = useState("");
 
-  // Card modal
   const [cardModal, setCardModal] = useState<Athlete | null>(null);
 
   const [firstName, setFirstName] = useState("");
@@ -54,12 +53,10 @@ export default function CoachAthletes() {
   const [picture, setPicture] = useState<File | null>(null);
   const [picturePreview, setPicturePreview] = useState<string | null>(null);
   
-  // NEW FIELDS
   const [height, setHeight] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
   const [age, setAge] = useState<string>("");
 
-  // Loading states
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -74,7 +71,6 @@ export default function CoachAthletes() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const token = localStorage.getItem("token");
 
-  // Auto-dismiss alert after 4 seconds
   useEffect(() => {
     if (!alert) return;
     const timer = setTimeout(() => setAlert(null), 4000);
@@ -99,7 +95,6 @@ export default function CoachAthletes() {
     return `${IMAGE_URL}/${picturePath}`;
   };
 
-  // FETCH ATHLETES
   const fetchAthletes = async () => {
     setIsLoading(true);
     try {
@@ -112,7 +107,7 @@ export default function CoachAthletes() {
       if (!res.ok) {
         setAlert({
           type: "error",
-          message: getErrorMessage(json, t("athletes.errors.fetch_failed", "Failed to fetch athletes")),
+          message: getErrorMessage(json, t("athletes.errors.fetch_failed")),
         });
         return;
       }
@@ -133,7 +128,7 @@ export default function CoachAthletes() {
     } catch (err) {
       setAlert({
         type: "error",
-        message: t("auth.errors.network", "Network error. Please check your connection."),
+        message: t("auth.errors.network"),
       });
       console.error("Failed to fetch athletes", err);
     } finally {
@@ -145,7 +140,6 @@ export default function CoachAthletes() {
     fetchAthletes();
   }, []);
 
-  // CLOSE MENU OUTSIDE CLICK
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -172,7 +166,7 @@ export default function CoachAthletes() {
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
       setAlert({
         type: "error",
-        message: t("athletes.errors.required_fields", "All fields are required"),
+        message: t("athletes.errors.required_fields"),
       });
       return;
     }
@@ -200,14 +194,14 @@ export default function CoachAthletes() {
       if (!res.ok) {
         setAlert({
           type: "error",
-          message: getErrorMessage(data, t("athletes.errors.create_failed", "Failed to create athlete")),
+          message: getErrorMessage(data, t("athletes.errors.create_failed")),
         });
         return;
       }
 
       setAlert({
         type: "success",
-        message: t("athletes.success.create_success", "Athlete created successfully"),
+        message: t("athletes.success.create_success"),
       });
 
       setIsModalOpen(false);
@@ -216,7 +210,7 @@ export default function CoachAthletes() {
     } catch (err) {
       setAlert({
         type: "error",
-        message: t("auth.errors.network", "Network error. Please check your connection."),
+        message: t("auth.errors.network"),
       });
       console.error(err);
     } finally {
@@ -230,7 +224,7 @@ export default function CoachAthletes() {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
       setAlert({
         type: "error",
-        message: t("athletes.errors.required_fields_edit", "First name, last name and email are required"),
+        message: t("athletes.errors.required_fields_edit"),
       });
       return;
     }
@@ -258,14 +252,14 @@ export default function CoachAthletes() {
       if (!res.ok) {
         setAlert({
           type: "error",
-          message: getErrorMessage(data, t("athletes.errors.update_failed", "Failed to update athlete")),
+          message: getErrorMessage(data, t("athletes.errors.update_failed")),
         });
         return;
       }
 
       setAlert({
         type: "success",
-        message: t("athletes.success.update_success", "Athlete updated successfully"),
+        message: t("athletes.success.update_success"),
       });
 
       setIsModalOpen(false);
@@ -276,7 +270,7 @@ export default function CoachAthletes() {
     } catch (err) {
       setAlert({
         type: "error",
-        message: t("auth.errors.network", "Network error. Please check your connection."),
+        message: t("auth.errors.network"),
       });
       console.error(err);
     } finally {
@@ -288,7 +282,7 @@ export default function CoachAthletes() {
     if (deleteInput !== athlete.email) {
       setAlert({
         type: "error",
-        message: t("athletes.errors.email_mismatch", "Email confirmation does not match"),
+        message: t("athletes.errors.email_mismatch"),
       });
       return;
     }
@@ -305,14 +299,14 @@ export default function CoachAthletes() {
       if (!res.ok) {
         setAlert({
           type: "error",
-          message: getErrorMessage(data, t("athletes.errors.delete_failed", "Failed to delete athlete")),
+          message: getErrorMessage(data, t("athletes.errors.delete_failed")),
         });
         return;
       }
 
       setAlert({
         type: "success",
-        message: t("athletes.success.delete_success", "Athlete deleted successfully"),
+        message: t("athletes.success.delete_success"),
       });
 
       setDeleteModal(null);
@@ -321,7 +315,7 @@ export default function CoachAthletes() {
     } catch (err) {
       setAlert({
         type: "error",
-        message: t("auth.errors.network", "Network error. Please check your connection."),
+        message: t("auth.errors.network"),
       });
       console.error(err);
     } finally {
@@ -375,37 +369,33 @@ export default function CoachAthletes() {
 
   return (
     <div className="coaches-dashboard">
-      {/* Alert Component */}
       {alert && (
         <div className="fixed top-5 right-5 z-50 w-[300px]">
           <Alert severity={alert.type}>{alert.message}</Alert>
         </div>
       )}
 
-      {/* HEADER */}
       <div className="dashboard-header">
-        <h1>{t("athletes.title", "Athletes")}</h1>
+        <h1>{t("athletes.title")}</h1>
         <button className="add-coach-btn" onClick={openCreateModal}>
-          {t("athletes.add", "+ Add athlete")}
+          {t("athletes.add")}
         </button>
       </div>
 
       <div className="header-divider" />
 
-      {/* SEARCH */}
       <div className="search-section">
         <div className="search-wrapper">
           <Search className="search-icon" size={16} />
           <input
             className="search-input"
-            placeholder={t("athletes.search", "Search")}
+            placeholder={t("athletes.search")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* TABLE */}
       <div className="table-container">
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
@@ -415,11 +405,11 @@ export default function CoachAthletes() {
           <table className="coaches-table">
             <thead>
               <tr>
-                <th>{t("athletes.picture", "Picture")}</th>
-                <th>{t("athletes.first", "First")}</th>
-                <th>{t("athletes.last", "Last")}</th>
-                <th>{t("athletes.email", "Email")}</th>
-                <th>{t("athletes.options", "Options")}</th>
+                <th>{t("athletes.picture")}</th>
+                <th>{t("athletes.first")}</th>
+                <th>{t("athletes.last")}</th>
+                <th>{t("athletes.email")}</th>
+                <th>{t("athletes.options")}</th>
               </tr>
             </thead>
 
@@ -427,7 +417,7 @@ export default function CoachAthletes() {
               {filteredAthletes.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="no-results">
-                    {t("athletes.no_results", "No athletes found")}
+                    {t("athletes.no_results")}
                   </td>
                 </tr>
               ) : (
@@ -469,10 +459,10 @@ export default function CoachAthletes() {
                       {openMenuId === athlete.id && (
                         <div className="options-menu" ref={menuRef}>
                           <button onClick={() => openEditModal(athlete)}>
-                            {t("athletes.edit", "Edit")}
+                            {t("athletes.edit")}
                           </button>
                           <button onClick={() => setDeleteModal(athlete)}>
-                            {t("athletes.delete", "Delete")}
+                            {t("athletes.delete")}
                           </button>
                         </div>
                       )}
@@ -485,12 +475,11 @@ export default function CoachAthletes() {
         )}
       </div>
 
-      {/* CREATE / EDIT MODAL */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => !isCreating && !isUpdating && setIsModalOpen(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{isEdit ? t("athletes.update", "Edit Athlete") : t("athletes.create", "New Athlete")}</h2>
+              <h2>{isEdit ? t("athletes.update") : t("athletes.create")}</h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 disabled={isCreating || isUpdating}
@@ -499,7 +488,6 @@ export default function CoachAthletes() {
               </button>
             </div>
 
-            {/* Picture Upload */}
             <div className="flex flex-col items-center gap-2">
               <div
                 className="w-24 h-24 rounded-full bg-gray-700 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-gray-600"
@@ -526,27 +514,27 @@ export default function CoachAthletes() {
                 disabled={isCreating || isUpdating}
               >
                 {picturePreview && isEdit && selectedAthlete?.picture === picturePreview
-                  ? t("athletes.change_picture", "Change picture")
-                  : t("athletes.upload_picture", "Upload picture")}
+                  ? t("athletes.change_picture")
+                  : t("athletes.upload_picture")}
               </button>
             </div>
 
             <input
-              placeholder={t("athletes.first_name", "First name")}
+              placeholder={t("athletes.first_name")}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               disabled={isCreating || isUpdating}
             />
 
             <input
-              placeholder={t("athletes.last_name", "Last name")}
+              placeholder={t("athletes.last_name")}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               disabled={isCreating || isUpdating}
             />
 
             <input
-              placeholder={t("athletes.email", "Email")}
+              placeholder={t("athletes.email")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -554,23 +542,22 @@ export default function CoachAthletes() {
             />
 
             <input
-              placeholder={isEdit ? t("athletes.password_optional", "Password (optional)") : t("athletes.password", "Password")}
+              placeholder={isEdit ? t("athletes.password_optional") : t("athletes.password")}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isCreating || isUpdating}
             />
 
-            {/* NEW FIELDS - Now stacked vertically */}
             <input
-              placeholder={t("athletes.height", "Height (cm)")}
+              placeholder={`${t("athletes.height")} (cm)`}
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               disabled={isCreating || isUpdating}
             />
             <input
-              placeholder={t("athletes.weight", "Weight (kg)")}
+              placeholder={`${t("athletes.weight")} (kg)`}
               type="number"
               step="0.1"
               value={weight}
@@ -578,7 +565,7 @@ export default function CoachAthletes() {
               disabled={isCreating || isUpdating}
             />
             <input
-              placeholder={t("athletes.age", "Age")}
+              placeholder={t("athletes.age")}
               type="number"
               value={age}
               onChange={(e) => setAge(e.target.value)}
@@ -591,7 +578,7 @@ export default function CoachAthletes() {
                 onClick={() => setIsModalOpen(false)}
                 disabled={isCreating || isUpdating}
               >
-                {t("athletes.cancel", "Cancel")}
+                {t("athletes.cancel")}
               </button>
 
               <button
@@ -600,21 +587,20 @@ export default function CoachAthletes() {
                 disabled={isCreating || isUpdating}
               >
                 {(isCreating || isUpdating) && <Loader2 className="spinner" size={16} />}
-                {isCreating ? t("athletes.creating", "Creating...") : isUpdating ? t("athletes.updating", "Updating...") : t("athletes.save", "Save")}
+                {isCreating ? t("athletes.creating") : isUpdating ? t("athletes.updating") : t("athletes.save")}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* DELETE MODAL */}
       {deleteModal && (
         <div className="modal-overlay" onClick={() => !isDeleting && setDeleteModal(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ color: 'white' }}>{t("athletes.confirm_delete", "Confirm Delete")}</h2>
+            <h2 style={{ color: 'white' }}>{t("athletes.confirm_delete")}</h2>
 
             <p style={{ color: 'white' }}>
-              {t("athletes.type_to_confirm", "Type email to confirm:")} <b>{deleteModal.email}</b>
+              {t("athletes.type_to_confirm")} <b>{deleteModal.email}</b>
             </p>
 
             <input
@@ -629,7 +615,7 @@ export default function CoachAthletes() {
                 onClick={() => setDeleteModal(null)}
                 disabled={isDeleting}
               >
-                {t("athletes.cancel", "Cancel")}
+                {t("athletes.cancel")}
               </button>
 
               <button
@@ -638,14 +624,13 @@ export default function CoachAthletes() {
                 disabled={deleteInput !== deleteModal.email || isDeleting}
               >
                 {isDeleting && <Loader2 className="spinner" size={16} />}
-                {isDeleting ? t("athletes.deleting", "Deleting...") : t("athletes.confirm", "Confirm")}
+                {isDeleting ? t("athletes.deleting") : t("athletes.confirm")}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ATHLETE CARD MODAL */}
       {cardModal && (
         <div className="modal-overlay" onClick={() => setCardModal(null)}>
           <div className="athlete-card-modal" onClick={(e) => e.stopPropagation()}>
@@ -682,7 +667,7 @@ export default function CoachAthletes() {
                 <div className="card-stat">
                   <Ruler size={20} className="card-stat-icon" />
                   <div className="card-stat-value">{cardModal.height}</div>
-                  <div className="card-stat-label">{t("athletes.height", "Height")} (cm)</div>
+                  <div className="card-stat-label">{t("athletes.height")} (cm)</div>
                 </div>
               )}
               
@@ -690,7 +675,7 @@ export default function CoachAthletes() {
                 <div className="card-stat">
                   <Weight size={20} className="card-stat-icon" />
                   <div className="card-stat-value">{cardModal.weight}</div>
-                  <div className="card-stat-label">{t("athletes.weight", "Weight")} (kg)</div>
+                  <div className="card-stat-label">{t("athletes.weight")} (kg)</div>
                 </div>
               )}
               
@@ -698,14 +683,14 @@ export default function CoachAthletes() {
                 <div className="card-stat">
                   <Calendar size={20} className="card-stat-icon" />
                   <div className="card-stat-value">{cardModal.age}</div>
-                  <div className="card-stat-label">{t("athletes.age", "Age")} {t("athletes.years", "years")}</div>
+                  <div className="card-stat-label">{t("athletes.age")} ({t("athletes.years")})</div>
                 </div>
               )}
             </div>
 
             {!cardModal.height && !cardModal.weight && !cardModal.age && (
               <p className="card-no-stats">
-                {t("athletes.no_stats", "No physical stats recorded yet")}
+                {t("athletes.no_stats")}
               </p>
             )}
 
@@ -717,7 +702,7 @@ export default function CoachAthletes() {
                   openEditModal(cardModal);
                 }}
               >
-                {t("athletes.edit", "Edit Profile")}
+                {t("athletes.edit")}
               </button>
             </div>
           </div>
